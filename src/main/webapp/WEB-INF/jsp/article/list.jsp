@@ -13,7 +13,7 @@
 	
 	<c:forEach items="${articles}" var="article">
 	<div>
-		${article.id} / ${article.regDate} / ${article.title}
+		<a href="detail?id=${article.id}">${article.id} / ${article.regDate} / ${article.title}</a>
 	</div>
 	</c:forEach>
 </body>
