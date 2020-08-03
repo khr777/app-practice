@@ -10,21 +10,39 @@
 		ORDER BY id DESC
 	</select>
 
-	<select id="getForPrintArticle" resultType="Article">
+	<select id="getForPrintArticleById" resultType="Article">
 		SELECT *
 		FROM article
-		WHERE id = ${id}
+		WHERE id = #{id}
 	</select>
 
-	<insert id="insertStudents" useGeneratedKeys="true"
-		resultType="int" keyProperty="id" parameterType="Article">
+	<insert id="add" parameterType="Map" useGeneratedKeys="true" keyProperty="newId">
 		INSERT INTO article
 		SET regDate = NOW(),
 		updateDate = NOW(),
-		delDate = "",
 		displayStatus = 1,
-		title = ${title},
-		body=${body}
+		title = #{title},
+		body = #{body}
 	</insert>
-
+	
+	<update id="modify" parameterType="map">
+		UPDATE article
+		SET updateDate = NOW(),
+		title = #{title},
+		body = #{body}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="map">
+		DELETE FROM article
+		WHERE id = #{id}
+	</delete>
+	
+	<update id="hitUp" parameterType="int">
+		UPDATE article
+		SET hit = hit + 1
+		WHERE id = #{id}
+	</update>
+	
+	
 </mapper>

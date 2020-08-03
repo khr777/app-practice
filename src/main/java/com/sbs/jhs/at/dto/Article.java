@@ -16,4 +16,5 @@ public class Article {
 	private boolean displayStatus;
 	private String title;
 	private String body;
+	private int hit;
 }
