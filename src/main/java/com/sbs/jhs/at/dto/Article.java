@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class Article {
-	private long id;
+	private int id;
 	private String regDate;
 	private String updateDate;
 	private boolean delStatus;

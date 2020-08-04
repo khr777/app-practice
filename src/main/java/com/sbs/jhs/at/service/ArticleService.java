@@ -9,31 +9,31 @@ import com.sbs.jhs.at.dto.Article;
 
 public interface ArticleService {
 	
-	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom);
+	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword);
 		
 
 	public Article getForPrintArticleById(int id);
 	
 
-	public long add(Map<String, Object> param);
+	public int write(Map<String, Object> param);
 
-	public int modify(@RequestParam Map<String, Object> param, long id);
+	public int modify(@RequestParam Map<String, Object> param, int id);
 
-	public long softDelete(long id);
+	public int softDelete(int id);
 
 	public void hitUp(int id);
 
 
-	public void deleteModify(long id);
+	public void deleteModify(int id);
 
 
-	public int getForPrintListArticlesCount();
+	public int getForPrintListArticlesCount(@RequestParam Map<String, Object> param, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword);
 
 
-	public int getForPageMoveBeforeArticle(int id);
+	public Integer getForPageMoveBeforeArticle(int id);
 
 
-	public int getForPageMoveAfterArticle(int id);
+	public Integer getForPageMoveAfterArticle(int id);
 
 
 }

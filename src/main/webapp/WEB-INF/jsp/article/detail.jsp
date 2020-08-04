@@ -47,10 +47,10 @@
 				value="삭제" />
 		</div>
 		<div class="move-button">
-			<c:if test="${beforeId != null}">
+			<c:if test="${beforeId > 0}">
 				<input class="before" value="이전글" type="button"	onclick="location.href='detail?id=${beforeId}'">
 			</c:if>
-			<c:if test="${afterId != null}">
+			<c:if test="${afterId != -1}">
 				<input class="after" value="다음글" type="button"	onclick="location.href='detail?id=${afterId}'">
 			</c:if>
 

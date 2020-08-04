@@ -11,6 +11,20 @@
 			<col width="100" />
 			<col width="200" />
 		</colgroup>
+		<div class="search">
+			<div class="search-box ">
+				<form action="list">
+					<input type="hidden" name="page" value="1" />
+					<input type="hidden" name="searchKeywordType" value="title" />
+					<input type="hidden" name="searchKeywordTypeBody" value="body" />
+					<input type="text" name="searchKeyword"	value="${param.searchKeyword}" class="box" />
+					<button type="submit" class="search-button">검색</button>
+				</form>
+			</div>
+			<div class="cateItem-content">
+				<div class="con total-count">총 게시물 수 : ${totalCount}</div>
+			</div>
+		</div>
 		<thead>
 			<tr>
 				<th>번호</th>
@@ -41,7 +55,8 @@
 	<div class="paging-box">
 		<c:forEach var="i" begin="1" end="${totalPage}" step="1">
 			<div class="paging-num-box ${i == cPage ? 'current' : ''}">
-				<a href="?page=${i}">${i}</a>
+				<a
+					href="?searchKeywordType=${param.searchKeywordType}&searchKeywordTypeBody=${param.searchKeywordTypeBody}&searchKeyword=${param.searchKeyword}&page=${i}">${i}</a>
 			</div>
 		</c:forEach>
 	</div>
@@ -52,54 +67,37 @@
 
 <style>
 .table-box .paging-box {
-	display:flex;
-	padding:10px;
+	display: flex;
+	padding: 10px;
 }
-
 
 .table-box .paging-box .paging-num-box {
-	padding:10px;
-} 
-
-
-
-
-
-
-
-
+	padding: 10px;
+}
 
 .paging-box {
-	display:flex;
-	font-size:1.2rem;
-	justify-content:center;
-	
+	display: flex;
+	font-size: 1.2rem;
+	justify-content: center;
 }
 
-.paging-box .paging-num-box  > a {
-	padding:20px 10px;
-	display:block;
-	text-decoration:underline;
-	color:#787878;
+.paging-box .paging-num-box>a {
+	padding: 20px 10px;
+	display: block;
+	text-decoration: underline;
+	color: #787878;
 }
 
-
-.paging-box .paging-num-box:hover  > a {
-	padding:20px 10px;
-	display:block;
-	text-decoration:underline;
-	color:black;
-	
+.paging-box .paging-num-box:hover>a {
+	padding: 20px 10px;
+	display: block;
+	text-decoration: underline;
+	color: black;
 }
 
-.paging-box .paging-num-box.current  > a {
-	color:red;
-	
-} 
-
-
-
-
+.paging-box .paging-num-box.current>a {
+	color: red;
+}
 </style>
 
 

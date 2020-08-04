@@ -7,81 +7,100 @@
 		SELECT *
 		FROM article
 		WHERE displayStatus = 1
+		<if
+			test="searchKeywordType.equals('title') and searchKeywordTypeBody.equals('body') and searchKeyword.length() > 0">
+			AND title like CONCAT('%', #{searchKeyword}, '%')
+			OR body like CONCAT('%', #{searchKeyword}, '%')
+		</if>
 		ORDER BY id DESC
-		LIMIT #{limitFrom}, ${itemsInAPage}   
+		LIMIT #{limitFrom}, ${itemsInAPage}
 	</select>
-	
+
 	<select id="getForPrintListArticlesCount" resultType="int">
 		SELECT COUNT(*) AS cnt
 		FROM article
 		WHERE displayStatus = 1
+		<if test="searchKeywordType.equals('title') and searchKeywordTypeBody.equals('body') and searchKeyword.length() >0 ">
+			AND title like CONCAT('%', #{searchKeyword}, '%')
+			OR body like CONCAT('%', #{searchKeyword}, '%')
+		</if>
 	</select>
-	
-	
-	
+
+
+
 	<select id="getForPrintArticleById" resultType="Article">
 		SELECT *
-		FROM article
+		FROM
+		article
 		WHERE id = #{id}
 	</select>
 
-	<insert id="add" parameterType="Map" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO article
+	<!-- parameterType : 메소드의 형태가 map임을 의미, 생략 가능 -->
+	<!-- parameterType 이 int다 doWrite(int id) 의 형태라면 -->
+	<!-- 만약 매개변수를 어노테이션을 통해서 받았다면 굳이 parameterType을 쓸 필요도 없다 -->
+	<!-- useGeneratedKeys : AUTO_INCREMENT id를 사용하겠다. 라는 의미__새 아이디 생성 -->
+	<!-- keyProperty="id"를 적어주면 메서드의 param에 id는 없었으나 id가 추가된다! -->
+	<insert id="write" useGeneratedKeys="true" keyProperty="id">
+		INSERT
+		INTO article
 		SET regDate = NOW(),
 		updateDate = NOW(),
 		displayStatus = 1,
 		title = #{title},
 		body = #{body}
 	</insert>
-	
+
 	<update id="modify" parameterType="map">
 		UPDATE article
-		SET updateDate = NOW(),
+		SET updateDate =
+		NOW(),
 		title = #{title},
 		body = #{body}
 		WHERE id = #{id}
 	</update>
-	
+
 	<update id="softDelete" parameterType="map">
 		UPDATE article
-		SET delStatus = 1,
+		SET
+		delStatus = 1,
 		delDate = NOW(),
 		displayStatus = 0
 		WHERE id = #{id}
 	</update>
-	
+
 	<update id="hitUp" parameterType="int">
 		UPDATE article
 		SET hit = hit + 1
 		WHERE id = #{id}
 	</update>
-	
+
 	<update id="deleteModify" parameterType="int">
 		UPDATE article
-		SET delStatus =1,
+		SET
+		delStatus =1,
 		dleDate = NOW(),
 		displayStatus = 1,
 		WHERE id = #{id}
 	</update>
-	<select id="getForPageMoveBeforeArticle" resultType="int">
+	<select id="getForPageMoveBeforeArticle" resultType="Integer">
 		SELECT id
 		FROM article
-		WHERE id <![CDATA[<]]> #{id}
+		WHERE id <![CDATA[<]]>#{id}
 		AND displayStatus = 1
 		ORDER BY id DESC
 		LIMIT 1
-	   
+
 	</select>
-	
-	<select id="getForPageMoveAfterArticle" resultType="int">
-	
+
+	<select id="getForPageMoveAfterArticle" resultType="Integer">
+
 		SELECT id
 		FROM article
-		WHERE id <![CDATA[>]]> #{id}
+		WHERE id <![CDATA[>]]>#{id}
 		AND displayStatus = 1
 		ORDER BY id ASC
 		LIMIT 1
-	   
+
 	</select>
-	
+
 </mapper>

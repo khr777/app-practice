@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.sbs.jhs.at.dao.ArticleDao;
 import com.sbs.jhs.at.dto.Article;
 import com.sbs.jhs.at.util.CUtil;
+import com.sbs.jhs.at.util.Util;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,9 +22,9 @@ public class ArticleServiceImpl implements ArticleService {
 	private ArticleDao articleDao;
 	
 	@Override
-	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom) {  // getList();
+	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword) {  // getList();
 		
-		List<Article> articles = articleDao.getForPrintArticles(param, itemsInAPage, limitFrom);
+		List<Article> articles = articleDao.getForPrintArticles(param, itemsInAPage, limitFrom, searchKeywordType, searchKeywordTypeBody, searchKeyword);
 		
 		return articles;
 	}
@@ -38,20 +39,20 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	
 	@Override
-	public long add(Map<String, Object> param) { // add
-		articleDao.add(param);
-		return CUtil.getAsLong(param.get("id"));
+	public int write(Map<String, Object> param) { // add
+		articleDao.write(param);
+		return Util.getAsInt(param.get("id"));
 	}
 	
 	@Override
-	public int modify(@RequestParam Map<String, Object> param, long id) {
+	public int modify(@RequestParam Map<String, Object> param, int id) {
 		int a = articleDao.modify(param);
 		return a;
 	}
 	
 	@Override
-	public long softDelete(long id) {
-		long a = articleDao.softDelete(id);
+	public int softDelete(int id) {
+		int a = articleDao.softDelete(id);
 		return a;
 	}
 	
@@ -60,23 +61,24 @@ public class ArticleServiceImpl implements ArticleService {
 		articleDao.hitUp(id);
 		
 	}
-	public void deleteModify(long id) {
+	@Override
+	public void deleteModify(int id) {
 		articleDao.deleteModify(id);
 		
 	}
 
 	@Override
-	public int getForPrintListArticlesCount() {
-		return articleDao.getForPrintListArticlesCount();
+	public int getForPrintListArticlesCount(@RequestParam Map<String, Object> param, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword) {
+		return articleDao.getForPrintListArticlesCount(param, searchKeywordType, searchKeywordTypeBody, searchKeyword);
 	}
 
 	@Override
-	public int getForPageMoveBeforeArticle(int id) {
+	public Integer getForPageMoveBeforeArticle(int id) {
 		return articleDao.getForPageMoveBeforeArticle(id);
 	}
 
 	@Override
-	public int getForPageMoveAfterArticle(int id) {
+	public Integer getForPageMoveAfterArticle(int id) {
 		return articleDao.getForPageMoveAfterArticle(id);
 	}
 
