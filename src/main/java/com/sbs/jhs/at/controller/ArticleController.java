@@ -22,10 +22,40 @@ public class ArticleController {
 	private ArticleService articleService;
 
 	@RequestMapping("/article/list")
-	public String showList(Model model) {
-		List<Article> articles = articleService.getForPrintArticles();
+	public String showList(Model model, @RequestParam Map<String, Object> param) {
+		
 
+		
+		
+		
+		int page = 1;
+		if ( param.get("page") != null  ) {
+			page = Integer.parseInt((String)param.get("page"));
+		}
+		int itemsInAPage = 10; // 게시물 리스트에 보여줄 게시물 개수
+		int limitFrom = (page-1) * itemsInAPage;
+		int totalCount = articleService.getForPrintListArticlesCount();
+		System.out.println("totalCount : " + totalCount);
+		int totalPage = (int) Math.ceil(totalCount / (double) itemsInAPage);
+
+	
+		
+		List<Article> articles = articleService.getForPrintArticles(param, itemsInAPage, limitFrom);
+		
+		
+		
 		model.addAttribute("articles", articles);
+		
+		
+		model.addAttribute("totalCount", totalCount);
+		model.addAttribute("totalPage", totalPage);
+		model.addAttribute("cPage", param.get("page"));
+		
+		
+		
+		
+		
+		
 
 		return "article/list";
 	}
@@ -43,8 +73,11 @@ public class ArticleController {
 		Article article = articleService.getForPrintArticleById(id);
 		
 		
-		
+		int beforeId = articleService.getForPageMoveBeforeArticle(id);
+		int afterId = articleService.getForPageMoveAfterArticle(id);
 		model.addAttribute("article", article);
+		model.addAttribute("beforeId", beforeId);
+		model.addAttribute("afterId", afterId);
 
 		return "article/detail";
 	}
@@ -59,7 +92,7 @@ public class ArticleController {
 	public String showDoAdd(@RequestParam Map<String, Object> param) {
 
 		long newId = articleService.add(param);
-
+		
 		String msg = newId + "번 게시물이 추가되었습니다.";
 
 		StringBuilder sb = new StringBuilder();
@@ -87,9 +120,9 @@ public class ArticleController {
 
 	@RequestMapping("/article/doModify")
 	@ResponseBody
-	public String showDoModify(Model model, String title, String body, int id) {
+	public String showDoModify(@RequestParam Map<String, Object> param, long id) {
 
-		articleService.modify(title, body, id);
+		articleService.modify(param, id);
 
 		
 		  String msg = id + "번 게시물이 수정되었습니다.";
@@ -106,10 +139,23 @@ public class ArticleController {
 	}
 
 	@RequestMapping("/article/delete")
-	public String showDelete(Model model, int id) {
-		articleService.delete(id);
+	@ResponseBody
+	public String showDelete(long id) {
+		 
+		articleService.softDelete(id);
 
-		return "home/main";
+		String msg = id + "번 게시물이 삭제되었습니다.";
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("alert('" + msg + "');");
+		sb.append("location.replace('./list');");
+
+		sb.insert(0, "<script>");
+		sb.append("</script>");
+
+		return sb.toString();
+		
 	}
 
 }

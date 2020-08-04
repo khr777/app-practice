@@ -34,18 +34,51 @@
 			</tr>
 		</tbody>
 	</table>
-	<input type="button"
-			onclick="location.href='../article/modify?id=${article.id}'"
-			value="수정" />
-		<input type="button"
-			onclick="location.href='../article/delete?id=${article.id}'"
-			value="삭제" />
-</div>
+	<div class="button">
+		<div class="back">
+			<input type="button" onclick="location.href='../article/list'"
+				value="뒤로가기" />
+		</div>
+		<div class="modifyAndDelete">
+			<input type="button"
+				onclick="location.href='../article/modify?id=${article.id}'"
+				value="수정" /> <input type="button"
+				onclick="location.href='../article/delete?id=${article.id}'"
+				value="삭제" />
+		</div>
+		<div class="move-button">
+			<c:if test="${beforeId != null}">
+				<input class="before" value="이전글" type="button"	onclick="location.href='detail?id=${beforeId}'">
+			</c:if>
+			<c:if test="${afterId != null}">
+				<input class="after" value="다음글" type="button"	onclick="location.href='detail?id=${afterId}'">
+			</c:if>
 
-<div class="btns con">
-	<a href="./list">게시물 리스트</a> 
-	<a href="./add">게시물 추가</a> 
-	<a onclick="if ( confirm('삭제하시겠습니까?') == false ) return false;"	href="./doDelete?id=${article.id}">게시물 삭제</a>
-</div>	
+		</div>
+	</div>
+</div>
+<style>
+.table-box {
+	
+}
+
+.table-box  .button {
+	display: flex;
+}
+
+.table-box .button .back {
+	margin-left: 30px;
+}
+
+.table-box  .button .modifyAndDelete {
+	margin-right: 0;
+	margin-left: auto;
+	width: 100px;
+	justify-content: space-around;
+}
+</style>
+
+
+
 
 <%@ include file="../part/foot.jspf"%>

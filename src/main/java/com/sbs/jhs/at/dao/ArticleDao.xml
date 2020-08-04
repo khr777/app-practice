@@ -8,15 +8,24 @@
 		FROM article
 		WHERE displayStatus = 1
 		ORDER BY id DESC
+		LIMIT #{limitFrom}, ${itemsInAPage}   
 	</select>
-
+	
+	<select id="getForPrintListArticlesCount" resultType="int">
+		SELECT COUNT(*) AS cnt
+		FROM article
+		WHERE displayStatus = 1
+	</select>
+	
+	
+	
 	<select id="getForPrintArticleById" resultType="Article">
 		SELECT *
 		FROM article
 		WHERE id = #{id}
 	</select>
 
-	<insert id="add" parameterType="Map" useGeneratedKeys="true" keyProperty="newId">
+	<insert id="add" parameterType="Map" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO article
 		SET regDate = NOW(),
 		updateDate = NOW(),
@@ -33,10 +42,13 @@
 		WHERE id = #{id}
 	</update>
 	
-	<delete id="delete" parameterType="map">
-		DELETE FROM article
+	<update id="softDelete" parameterType="map">
+		UPDATE article
+		SET delStatus = 1,
+		delDate = NOW(),
+		displayStatus = 0
 		WHERE id = #{id}
-	</delete>
+	</update>
 	
 	<update id="hitUp" parameterType="int">
 		UPDATE article
@@ -44,5 +56,32 @@
 		WHERE id = #{id}
 	</update>
 	
+	<update id="deleteModify" parameterType="int">
+		UPDATE article
+		SET delStatus =1,
+		dleDate = NOW(),
+		displayStatus = 1,
+		WHERE id = #{id}
+	</update>
+	<select id="getForPageMoveBeforeArticle" resultType="int">
+		SELECT id
+		FROM article
+		WHERE id <![CDATA[<]]> #{id}
+		AND displayStatus = 1
+		ORDER BY id DESC
+		LIMIT 1
+	   
+	</select>
+	
+	<select id="getForPageMoveAfterArticle" resultType="int">
+	
+		SELECT id
+		FROM article
+		WHERE id <![CDATA[>]]> #{id}
+		AND displayStatus = 1
+		ORDER BY id ASC
+		LIMIT 1
+	   
+	</select>
 	
 </mapper>
