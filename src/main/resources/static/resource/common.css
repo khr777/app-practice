@@ -43,6 +43,8 @@ label[for] {
 	padding: 10px;
 	text-align: left;
 }
+
+
 /* 폼 관련 라이브러리 */
 
 
@@ -57,10 +59,16 @@ label[for] {
 
 .form1 .form-control-box >textarea {
 	min-height:300px;
+/* 	height:300px; */
 	resize:none;
 	
 }
 
+/* !important 의미 : 우선 순위를 가장 높이 올려버리는__남용하면 좋은 것은 아니다.*/
+.height-100px {
+	min-height:100px !important;
+/* 	write 페이지의 textarea를 min-height로 하고 .height-100px 을 !important했더니 먹지 않았으나 동일하게 min-을 적용하니 css가 입혀짐   */
+}
 
 
 /* 커스텀 */
@@ -72,3 +80,19 @@ label[for] {
 	margin-top:30px;
 	margin-bottom:30px;
 } 
+
+/* head.jspf __ outer-box 시작 */
+
+.outer-box  {
+}
+.outer-box .menu-box > ul  {
+}
+.outer-box .menu-box > ul > li  {
+	display:inline-block;
+}
+
+.outer-box .menu-box > ul > li > a {
+	display:block;
+	padding:10px;
+}
+/* head.jspf __ outer-box 끝 */

@@ -102,5 +102,40 @@
 		LIMIT 1
 
 	</select>
+	
+	<insert id="writeReply" useGeneratedKeys="true" >
+		INSERT INTO articleReply
+		SET regDate = NOW(),
+		updateDate = NOW(),
+		displayStatus = 1,
+		articleId = #{articleId}, 
+		body = #{body}
+	</insert>
+	
+	
+<!-- 	articleDao.java 에서 해당 메서드의 인자를 articleId로 셋팅해두었기 때문에 #{articleId}로 사용 가능 -->
+	<select id="getForPrintArticleReplies" resultType="ArticleReply">
+		SELECT *
+		FROM articleReply
+		WHERE displayStatus = 1
+		AND articleId = #{articleId} 
+		ORDER BY id DESC
+	</select>
+	
+	<select id="getArticleReply" resultType="ArticleReply">
+		SELECT *
+		FROM
+		articleReply
+		WHERE id = #{id}
+	</select>
+	
+	<update id="softDeleteArticleReply" parameterType="map">
+		UPDATE articleReply
+		SET	delStatus = 1,
+		delDate = NOW(),
+		displayStatus = 0
+		WHERE id = #{id}
+	</update>
+	
 
 </mapper>

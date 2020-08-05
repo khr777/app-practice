@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
+import com.sbs.jhs.at.dto.ArticleReply;
 import com.sbs.jhs.at.service.ArticleService;
 import com.sbs.jhs.at.util.Util;
 
@@ -85,7 +86,14 @@ public class ArticleController {
 		model.addAttribute("afterId", afterId);
 
 		model.addAttribute("article", article);
-
+		
+		
+		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(article.getId());
+		
+		
+		
+		
+		model.addAttribute("articleReplies", articleReplies); // 굽는다.
 		return "article/detail";
 	}
 
@@ -114,6 +122,23 @@ public class ArticleController {
 		// Spring Boot의 특징 : 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다.
 		return "redirect:" + redirectUrl;
 	}
+	
+	@RequestMapping("/article/doWriteReply")
+	public String doWriteReply(@RequestParam Map<String, Object> param) {
+		
+		System.out.println("param이 담고 있는 것은? : " + param);
+		Map<String, Object> rs = articleService.writeReply(param);
+		
+		int articleId = Util.getAsInt((String)param.get("articleId"));    
+
+		String redirectUrl = (String) param.get("redirectUrl");
+		redirectUrl = redirectUrl.replace("#id", articleId + "");
+		
+		
+		// Spring Boot의 특징 : "redirect:" 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다.
+		return "redirect:" + redirectUrl;
+	}
+
 
 	@RequestMapping("/article/modify")
 	public String showModify(Model model, int id) {
@@ -164,5 +189,45 @@ public class ArticleController {
 		return sb.toString();
 
 	}
+	
+	@RequestMapping("/article/doDeleteReply")
+	public String doDeleteReply(Model model, @RequestParam Map<String, Object> param) {
+		
+		// 댓글 삭제 가능한지 물어보는 메서드
+		//Map<String, Object> articleReplyDeleteAvailable = articleService.getArticleReplyDeleteAvailable(id);
+
+		// Map<String, Object> rs = articleService.softDeleteArticleReply(id);
+		
+		Map<String, Object> rs = articleService.softDeleteArticleReply(Util.getAsInt(param.get("id")));
+		
+		String redirectUrl = (String)param.get("redirectUrl");
+		System.out.println("redirectUrl : " + redirectUrl);
+		int articleId = Util.getAsInt(param.get("articleId"));
+		redirectUrl = redirectUrl.replace("#id", articleId + "");
+		System.out.println("redirectUrl : " + redirectUrl);
+		// ---------------- 혹시 articleId 형 변환을 해야 할 수도???????????
+		
+		
+		
+		
+		
+		
+		/*
+		 * String msg = id + "번 게시물이 삭제되었습니다.";
+		 * 
+		 * StringBuilder sb = new StringBuilder();
+		 * 
+		 * sb.append("alert('" + msg + "');"); sb.append("location.replace('./list');");
+		 * 
+		 * sb.insert(0, "<script>"); sb.append("</script>");
+		 * 
+		 * return sb.toString();
+		 */
+		return "redirect:" + redirectUrl;
+	}
+
+	
+	
+	
 
 }

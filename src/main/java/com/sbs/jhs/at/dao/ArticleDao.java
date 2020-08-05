@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sbs.jhs.at.dto.Article;
+import com.sbs.jhs.at.dto.ArticleReply;
 
 @Mapper
 public interface ArticleDao {
@@ -31,6 +32,14 @@ public interface ArticleDao {
 	Integer getForPageMoveBeforeArticle(int id);
 
 	Integer getForPageMoveAfterArticle(int id);
+
+	void writeReply(@RequestParam Map<String, Object> param);
+
+	List<ArticleReply> getForPrintArticleReplies(@Param("articleId") int articleId); // @Param("id") 의미 : int id를 "id"라는 이름으로 쓸 수 있다.
+
+	ArticleReply getArticleReply(@Param("id") int id);
+
+	void softDeleteArticleReply(@Param("id") int id);
 
 
 }

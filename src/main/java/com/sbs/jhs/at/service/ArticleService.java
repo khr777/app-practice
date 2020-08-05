@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sbs.jhs.at.dto.Article;
+import com.sbs.jhs.at.dto.ArticleReply;
 
 public interface ArticleService {
 	
@@ -34,6 +35,21 @@ public interface ArticleService {
 
 
 	public Integer getForPageMoveAfterArticle(int id);
+
+
+	public Map<String, Object> writeReply(@RequestParam Map<String, Object> param);
+
+
+	public List<ArticleReply> getForPrintArticleReplies(int articleId);
+
+
+	public Map<String, Object> getArticleReplyDeleteAvailable(int id);
+
+
+	public ArticleReply getArticleReply(int id);
+
+
+	public Map<String, Object> softDeleteArticleReply(int id);
 
 
 }
