@@ -18,58 +18,61 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
-	
+
 	@Autowired
 	private ArticleDao articleDao;
-	
+
 	@Override
-	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword) {  // getList();
-		
-		List<Article> articles = articleDao.getForPrintArticles(param, itemsInAPage, limitFrom, searchKeywordType, searchKeywordTypeBody, searchKeyword);
-		
+	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom,
+			String searchKeywordType, String searchKeywordTypeBody, String searchKeyword) { // getList();
+
+		List<Article> articles = articleDao.getForPrintArticles(param, itemsInAPage, limitFrom, searchKeywordType,
+				searchKeywordTypeBody, searchKeyword);
+
 		return articles;
 	}
-	
+
 	@Override
 	public Article getForPrintArticleById(int id) {
-		
+
 		Article article = articleDao.getForPrintArticleById(id);
-		
-		
+
 		return article;
 	}
-	
+
 	@Override
 	public int write(Map<String, Object> param) { // add
 		articleDao.write(param);
 		return Util.getAsInt(param.get("id"));
 	}
-	
+
 	@Override
 	public int modify(@RequestParam Map<String, Object> param, int id) {
 		int a = articleDao.modify(param);
 		return a;
 	}
-	
+
 	@Override
 	public int softDelete(int id) {
 		int a = articleDao.softDelete(id);
 		return a;
 	}
-	
+
 	@Override
 	public void hitUp(int id) {
 		articleDao.hitUp(id);
-		
-	}
-	@Override
-	public void deleteModify(int id) {
-		articleDao.deleteModify(id);
-		
+
 	}
 
 	@Override
-	public int getForPrintListArticlesCount(@RequestParam Map<String, Object> param, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword) {
+	public void deleteModify(int id) {
+		articleDao.deleteModify(id);
+
+	}
+
+	@Override
+	public int getForPrintListArticlesCount(@RequestParam Map<String, Object> param, String searchKeywordType,
+			String searchKeywordTypeBody, String searchKeyword) {
 		return articleDao.getForPrintListArticlesCount(param, searchKeywordType, searchKeywordTypeBody, searchKeyword);
 	}
 
@@ -99,10 +102,10 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public Map<String, Object> getArticleReplyDeleteAvailable(int id) {
-		ArticleReply articleReply = getArticleReply(id); 
+		ArticleReply articleReply = getArticleReply(id);
 		return null;
 	}
-	
+
 	@Override
 	public ArticleReply getArticleReply(int id) {
 		return articleDao.getArticleReply(id);
@@ -116,9 +119,22 @@ public class ArticleServiceImpl implements ArticleService {
 		return rs;
 	}
 
+	@Override
+	public ArticleReply getForPrintArticleReplyById(int id) {
+		ArticleReply articleReply = articleDao.getForPrintArticleReplyById(id);
 
+		return articleReply;
+	}
+	
+	@Override
+	public int modifyReply(@RequestParam Map<String, Object> param, int id) {
+		int a = articleDao.modifyReply(param);
+		return a;
+	}
+
+	@Override
+	public List<ArticleReply> getForPrintArticleReplies(int id, int from) {
+		return articleDao.getForPrintArticleRepliesFrom(id, from);
+	}
 
 }
-
-
-

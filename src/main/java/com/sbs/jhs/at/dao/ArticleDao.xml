@@ -136,6 +136,28 @@
 		displayStatus = 0
 		WHERE id = #{id}
 	</update>
+	<select id="getForPrintArticleReplyById" resultType="ArticleReply">
+		SELECT *
+		FROM articleReply
+		WHERE id = #{id}
+	</select>
+	
+	<update id="modifyReply" parameterType="map">
+		UPDATE articleReply
+		SET updateDate = NOW(),
+		body = #{body}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getForPrintArticleRepliesFrom" resultType="ArticleReply">
+		SELECT *
+		FROM articleReply
+		WHERE displayStatus = 1
+		AND articleId = #{id}
+		AND id >= #{from} 
+		ORDER BY id DESC
+	</select>
+	
 	
 
 </mapper>

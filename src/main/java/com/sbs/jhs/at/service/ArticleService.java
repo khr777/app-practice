@@ -52,6 +52,15 @@ public interface ArticleService {
 	public Map<String, Object> softDeleteArticleReply(int id);
 
 
+	public ArticleReply getForPrintArticleReplyById(int id);
+
+
+	public int modifyReply(@RequestParam Map<String, Object> param, int id);
+
+
+	public List<ArticleReply> getForPrintArticleReplies(int id, int from);
+
+
 }
 
 

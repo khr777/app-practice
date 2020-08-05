@@ -41,5 +41,14 @@ public interface ArticleDao {
 
 	void softDeleteArticleReply(@Param("id") int id);
 
+	ArticleReply getForPrintArticleReplyById(@Param("id") int id);
+	
+	
+	//@RequestParam Map<String, Object> param, int id 는 중복?이어서 함께 articleDao로 보낼 수 없는가봄??에러 발생한다. int id 빼니까 오류 안남.
+	int modifyReply(@RequestParam Map<String, Object> param);
+
+	List<ArticleReply> getForPrintArticleRepliesFrom(@Param("id") int id, @Param("from") int from);
+
+
 
 }

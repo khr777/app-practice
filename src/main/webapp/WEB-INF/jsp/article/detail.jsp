@@ -61,10 +61,39 @@
 	</div>
 </div>
 <h2 class="con">댓글 작성</h2>
-<form method="POST" class="form1" action="./doWriteReply"
-	onsubmit="ArticleReplyWriteForm__submit(this); return false;">
-	<input type="hidden" name="redirectUrl" value="/article/detail?id=#id">
-	<input type="hidden" name="articleId" value="${article.id}">
+
+<script>
+
+	
+	function ArticleReply__submitWriteForm(form) {
+		form.body.value = form.body.value.trim();
+		if ( form.body.value.length == 0 ) {
+			alert('댓글을 입력해주세요.');
+			form.body.focus();
+			return;
+		}
+
+		// Ajax화 시작
+		$.post(	'./doWriteReplyAjax',   // 기존 form 의 action을 입력해주고 전송할 데이터를 입력해준다.
+			{	
+				articleId : ${param.id},
+				body: form.body.value
+			},
+			function(data) {
+			
+			},
+			'json' // 필수
+		);
+		form.body.value = '';
+		// body 를 전송하고 원문을 비워준다. 그래야 댓글창으로 돌아왔을 때, 빈칸으로 입력 가능하다!
+	}
+</script>
+<!-- <form method="POST" class="form1" action="./doWriteReply"  Ajax화로 method와 action이 의미없어짐 -->
+<!-- Ajax화로 form은 이제 발송용으로 사용되지 않는다. -->
+<form class="form1"
+	onsubmit="ArticleReply__submitWriteForm(this); return false;">
+	<!-- 	<input type="hidden" name="redirectUrl" value="/article/detail?id=#id"> -->
+	<%-- 	<input type="hidden" name="articleId" value="${article.id}"> --%>
 	<div class="table-box con">
 		<table>
 			<tbody>
@@ -89,7 +118,57 @@
 </form>
 
 <h2 class="con">댓글 리스트</h2>
-<div class="table-box con">
+
+<script>
+var ArticleReply__lastLoadedArticleReplyId = 0;
+
+function ArticleReply__loadList() {
+	$.get('./getForPrintArticleRepliesRs',{
+			id : ${param.id},
+			from : ArticleReply__lastLoadedArticleReplyId + 1 
+		}, function(data) {
+			data.articleReplies = data.articleReplies.reverse();
+			for ( var i = 0; i < data.articleReplies.length; i++ ) {
+				var articleReply = data.articleReplies[i];
+				ArticleReply__drawReply(articleReply);
+
+				ArticleReply__lastLoadedArticleReplyId = articleReply.id;
+			}
+		},'json' );
+}
+
+var ArticleReply__$listTbody;
+
+
+function ArticleReply__drawReply(articleReply) {
+	var html = '';
+	html += '<tr data-article-reply-id="' + articleReply.id + '"">';
+	html += '<td>' + articleReply.id + '</td>';
+	html += '<td>' + articleReply.regDate + '</td>';
+	html += '<td>' + articleReply.body+ '</td>';
+	html +=  '<td>';
+	html += '<a href="#">삭제</a>';
+	html += '<a href="#">수정</a>';
+	html += '</td>';
+	html += '</tr>';
+	
+
+
+
+	
+	ArticleReply__$listTbody.prepend(html);
+}
+// html ? 밑에까지 다 처리가 된 후 마지막에 실행되게 하는 함수 실행법 
+$(function() {
+
+	ArticleReply__$listTbody = $('.article-reply-list-box > table tbody');
+	//ArticleReply__loadList();
+
+	setInterval(ArticleReply__loadList, 1000);
+});
+</script>
+
+<div class="article-reply-list-box table-box con">
 	<table>
 		<colgroup>
 			<col width="100" />
@@ -107,22 +186,23 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach items="${articleReplies}" var="articleReply">
+			<%-- <c:forEach items="${articleReplies}" var="articleReply">
 				<div class="replyList">
 					<tr>
 						<td>${articleReply.id}</td>
 						<td>${articleReply.regDate}</td>
 						<td>${articleReply.body}</td>
-						<td><a
-							href="./doDeleteReply?id=${articleReply.id}&redirectUrl=/article/detail?id=${article.id}"
-							onclick="if ( confirm('삭제하시겠습니까?') == false ) {return false; }">삭제</a>
+						<td><a href="#">삭제</a>
+							<a href="#">수정</a>
 						</td>
 					</tr>
 				</div>
-			</c:forEach>
+			</c:forEach> --%>
 		</tbody>
 	</table>
 </div>
+
+
 
 
 <style>
@@ -138,8 +218,6 @@
 	margin-left: 30px;
 }
 
-
-
 .table-box  .button .modifyAndDelete {
 	margin-right: 0;
 	margin-left: auto;
@@ -147,8 +225,8 @@
 	justify-content: space-around;
 }
 
-.table-box .replyList tr > td:hover a:first-child {
-	color:red;
+a:hover {
+	color: red;
 }
 </style>
 

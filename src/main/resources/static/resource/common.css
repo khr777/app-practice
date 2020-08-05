@@ -48,7 +48,7 @@ label[for] {
 /* 폼 관련 라이브러리 */
 
 
-.form1 .form-control-box>input, .form1 .form-control-box>textarea {
+.form1 .form-control-box>input, .form1 .form-control-box> textarea {
 	width: 100%;
 	padding: 0;
 	margin: 0;
@@ -94,5 +94,10 @@ label[for] {
 .outer-box .menu-box > ul > li > a {
 	display:block;
 	padding:10px;
+}
+
+.outer-box .menu-box  ul  li:hover  a:first-child {
+	color:blue;
+	font-weight:bold;
 }
 /* head.jspf __ outer-box 끝 */
