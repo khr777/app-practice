@@ -17,8 +17,6 @@ public class NeedToLoginInterceptor implements HandlerInterceptor {
 		
 		
 		
-		
-		System.out.println("needToLoginInterceptor 실행됨!");
 
 		return HandlerInterceptor.super.preHandle(request, response, handler);
 	}

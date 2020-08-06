@@ -4,7 +4,7 @@ CREATE DATABASE `at`;
 USE `at`;
 # article 테이블 세팅
 CREATE TABLE article (
-    id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
+    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     regDate DATETIME, # 날짜에는 입력되는게 없으면 0000-00-00 00:00:00 을 하기 위함으로 NOT NULL을 뺏음
     updateDate DATETIME,
     delDate DATETIME,
@@ -33,22 +33,59 @@ title = '제목3',
 `body` = '내용3',
 displayStatus = 1;
 
-
 SELECT *
 FROM article;
 
-DESC article;
+# 댓글..... 
+CREATE TABLE articleReply (
+    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    regDate DATETIME, # 날짜에는 입력되는게 없으면 0000-00-00 00:00:00 을 하기 위함으로 NOT NULL을 뺏음
+    updateDate DATETIME,
+    delDate DATETIME,
+    articleId INT(10) UNSIGNED NOT NULL,
+	delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+	displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+    `body` LONGTEXT NOT NULL
+);
 
-UPDATE article
-SET updateDate = NOW(),
-title = '왜 안되냐 sql',
-`body` = '왜 안되냐 sql',
-WHERE displayStatus = 1
-AND id = 3
+INSERT INTO article
+SET regDate = NOW(),
+updateDate = NOW(),
+displayStatus = 1,
+title = 'db 놓고왔네ㅠㅠㅠㅠㅠㅠ',
+`body` = '으아아아아ㅠㅠㅠㅠㅠ';
+
+SELECT *
+FROM articleReply;
 
 
-UPDATE article
-SET delStatus = 1,
-delDate = NOW(),
-displayStatus = 0,
-WHERE id = 4
+SELECT *
+FROM articleReply
+WHERE id = 1
+
+# member 테이블 세팅
+CREATE TABLE `member` (
+id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT ,
+regDate DATETIME,
+updateDate DATETIME,
+delDate DATETIME,
+delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+authStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+loginId CHAR(20) NOT NULL UNIQUE,
+loginPw CHAR(100) NOT NULL,
+`name` CHAR(20) NOT NULL,
+`nickname` CHAR(20) NOT NULL,
+`email` CHAR(100) NOT NULL,
+`phoneNo` CHAR(20) NOT NULL
+);
+
+# member 테이블에 테스트 데이터 삽입
+INSERT INTO `member`
+SET regDate = NOW(),
+updateDate = NOW(),
+loginId = 'admin',
+loginPw = SHA2('admin', 256),
+`name` = '관리자',
+`nickname` = '관리자',
+`email` = ' ',
+`phoneNo` = ' ' ;
