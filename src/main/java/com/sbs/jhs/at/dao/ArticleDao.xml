@@ -10,7 +10,8 @@
 		<if
 			test="searchKeywordType.equals('title') and searchKeywordTypeBody.equals('body') and searchKeyword.length() > 0">
 			AND title like CONCAT('%', #{searchKeyword}, '%')
-			OR body like CONCAT('%', #{searchKeyword}, '%')
+			OR body like
+			CONCAT('%', #{searchKeyword}, '%')
 		</if>
 		ORDER BY id DESC
 		LIMIT #{limitFrom}, ${itemsInAPage}
@@ -20,9 +21,11 @@
 		SELECT COUNT(*) AS cnt
 		FROM article
 		WHERE displayStatus = 1
-		<if test="searchKeywordType.equals('title') and searchKeywordTypeBody.equals('body') and searchKeyword.length() >0 ">
+		<if
+			test="searchKeywordType.equals('title') and searchKeywordTypeBody.equals('body') and searchKeyword.length() >0 ">
 			AND title like CONCAT('%', #{searchKeyword}, '%')
-			OR body like CONCAT('%', #{searchKeyword}, '%')
+			OR body like
+			CONCAT('%', #{searchKeyword}, '%')
 		</if>
 	</select>
 
@@ -102,62 +105,91 @@
 		LIMIT 1
 
 	</select>
-	
-	<insert id="writeReply" useGeneratedKeys="true" >
-		INSERT INTO articleReply
+
+	<insert id="writeReply" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO
+		articleReply
 		SET regDate = NOW(),
 		updateDate = NOW(),
 		displayStatus = 1,
-		articleId = #{articleId}, 
-		body = #{body}
+		articleId = #{articleId},
+		body = #{body},
+		memberId =
+		#{memberId}
 	</insert>
-	
-	
-<!-- 	articleDao.java 에서 해당 메서드의 인자를 articleId로 셋팅해두었기 때문에 #{articleId}로 사용 가능 -->
+
+
+	<!-- articleDao.java 에서 해당 메서드의 인자를 articleId로 셋팅해두었기 때문에 #{articleId}로 
+		사용 가능 -->
 	<select id="getForPrintArticleReplies" resultType="ArticleReply">
 		SELECT *
-		FROM articleReply
+		FROM
+		articleReply
 		WHERE displayStatus = 1
-		AND articleId = #{articleId} 
-		ORDER BY id DESC
+		AND articleId = #{articleId}
+		ORDER
+		BY id DESC
 	</select>
-	
+
 	<select id="getArticleReply" resultType="ArticleReply">
 		SELECT *
 		FROM
 		articleReply
 		WHERE id = #{id}
 	</select>
-	
-	<update id="softDeleteArticleReply" >
+
+	<update id="softDeleteArticleReply">
 		UPDATE articleReply
-		SET	delStatus = 1,
+		SET
+		delStatus = 1,
 		delDate = NOW(),
 		displayStatus = 0
 		WHERE id = #{id}
 	</update>
-	<select id="getForPrintArticleReplyById" resultType="ArticleReply">
+	<select id="getForPrintArticleReplyById"
+		resultType="ArticleReply">
 		SELECT *
 		FROM articleReply
 		WHERE id = #{id}
 	</select>
-	
+
 	<update id="modifyReply" parameterType="map">
 		UPDATE articleReply
-		SET updateDate = NOW(),
+		SET
+		updateDate = NOW(),
 		body = #{body}
 		WHERE id = #{id}
 	</update>
-	
-	<select id="getForPrintArticleRepliesFrom" resultType="ArticleReply">
-		SELECT *
-		FROM articleReply
-		WHERE displayStatus = 1
-		AND articleId = #{id}
-		AND id >= #{from} 
-		ORDER BY id DESC
+
+	<select id="getForPrintArticleRepliesFrom"
+		resultMap="articleReply">
+		<![CDATA[
+		SELECT AR.*,
+		M.nickname AS extra__writer
+		FROM articleReply AS AR
+		INNER JOIN member AS M
+		ON AR.memberId = M.id
+		WHERE AR.displayStatus = 1
+		AND	AR.articleId = #{id}
+		AND AR.id >= #{from}
+		ORDER BY AR.id DESC
+		]]>
+		<!-- 샘은 ORDER BY id ASC 하시고, reverse 사용 안하심 -->
 	</select>
-	
-	
+
+	<resultMap type="ArticleReply" id="articleReply">
+		<id property="id" column="id" />
+		<id property="regDate" column="regDate" />
+		<id property="updateDate" column="updateDate" />
+		<id property="delDate" column="delDate" />
+		<id property="delStatus" column="delStatus" />
+		<id property="body" column="body" />
+		<id property="memberId" column="memberId" />
+		<id property="articleId" column="articleId" />
+		<association property="extra" javaType="map">
+			<id property="writer" column="extra__writer" />
+		</association>
+	</resultMap>
+
 
 </mapper>

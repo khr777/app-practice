@@ -87,18 +87,15 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 
 	@Override
-	public Map<String, Object> writeReply(@RequestParam Map<String, Object> param) {
+	public int writeReply(@RequestParam Map<String, Object> param) {
 		articleDao.writeReply(param);
-		int id = Util.getAsInt(param.get("articleId"));
-		Map<String, Object> rs = new HashMap<>();
-		rs.put("msg", String.format("%d번 게시물 댓글이 생성되었습니다.", id));
-		return rs;
+		
+		return Util.getAsInt(param.get("id"));
 	}
-
-	@Override
-	public List<ArticleReply> getForPrintArticleReplies(int articleId) {
-		return articleDao.getForPrintArticleReplies(articleId);
-	}
+	/*
+	 * @Override public List<ArticleReply> getForPrintArticleReplies(int articleId)
+	 * { return articleDao.getForPrintArticleReplies(articleId); }
+	 */
 
 	@Override
 	public Map<String, Object> getArticleReplyDeleteAvailable(int id) {
@@ -116,6 +113,7 @@ public class ArticleServiceImpl implements ArticleService {
 		articleDao.softDeleteArticleReply(id);
 		Map<String, Object> rs = new HashMap<>();
 		rs.put("msg", String.format("%d번 댓글을 삭제했습니다.", id));
+		rs.put("resultCode", "S-1");
 		return rs;
 	}
 
@@ -138,8 +136,9 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 
 	@Override
-	public List<ArticleReply> getForPrintArticleReplies(int id, int from) {
-		return articleDao.getForPrintArticleRepliesFrom(id, from);
+	public List<ArticleReply> getForPrintArticleReplies(@RequestParam Map<String, Object> param) {
+		return articleDao.getForPrintArticleRepliesFrom(param);
 	}
+
 
 }

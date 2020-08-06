@@ -37,10 +37,10 @@ public interface ArticleService {
 	public Integer getForPageMoveAfterArticle(int id);
 
 
-	public Map<String, Object> writeReply(@RequestParam Map<String, Object> param);
+	public int writeReply(@RequestParam Map<String, Object> param);
 
 
-	public List<ArticleReply> getForPrintArticleReplies(int articleId);
+	public List<ArticleReply> getForPrintArticleReplies(@RequestParam Map<String, Object> param);
 
 
 	public Map<String, Object> getArticleReplyDeleteAvailable(int id);
@@ -58,7 +58,7 @@ public interface ArticleService {
 	public Map<String, Object> modifyReply(@RequestParam Map<String, Object> param, int id);
 
 
-	public List<ArticleReply> getForPrintArticleReplies(int id, int from);
+	//public List<ArticleReply> getForPrintArticleReplies(int id, int from);
 
 
 }

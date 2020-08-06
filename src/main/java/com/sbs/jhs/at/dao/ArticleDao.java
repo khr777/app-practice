@@ -49,6 +49,8 @@ public interface ArticleDao {
 
 	List<ArticleReply> getForPrintArticleRepliesFrom(@Param("id") int id, @Param("from") int from);
 
+	List<ArticleReply> getForPrintArticleRepliesFrom(@RequestParam Map<String, Object> param);
+
 
 
 }

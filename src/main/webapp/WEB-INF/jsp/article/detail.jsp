@@ -38,6 +38,10 @@
 				<td>${article.regDate }</td>
 			</tr>
 			<tr>
+				<th>작성자</th>
+				<td>${article.extra.writer}</td>
+			</tr>
+			<tr>
 				<th>조회수</th>
 				<td>${article.hit}</td>
 			</tr>
@@ -78,12 +82,13 @@
 		</div>
 	</div>
 </div>
-<h2 class="con">댓글 작성</h2>
+<c:if test="${isLogined}">
+	<h2 class="con">댓글 작성</h2>
 
-<script>
+	<script>
 
 	
-	function ArticleReply__submitWriteForm(form) {
+	function ArticleWriteReplyFrom__submit(form) {
 		form.body.value = form.body.value.trim();
 		if ( form.body.value.length == 0 ) {
 			alert('댓글을 입력해주세요.');
@@ -96,23 +101,23 @@
 			{	
 				articleId : ${param.id},
 				body: form.body.value
+				// ajax: true  만약 post를 ./doWriteReplyAjax  Ajax를 붙이지 않는 경우 이렇게 ajax true를 날려주는게 좋다. 
 			},
 			function(data) {
 			
 			},
-			'json' // 필수
+			'json' // 필수 ( data 객체를 자바스크립트로 다루겠다는 의미)
 		);
 		form.body.value = '';
 		// body 를 전송하고 원문을 비워준다. 그래야 댓글창으로 돌아왔을 때, 빈칸으로 입력 가능하다!
 	}
 </script>
-<!-- <form method="POST" class="form1" action="./doWriteReply"  Ajax화로 method와 action이 의미없어짐 -->
-<!-- Ajax화로 form은 이제 발송용으로 사용되지 않는다. -->
-<form class="form1"
-	onsubmit="ArticleReply__submitWriteForm(this); return false;">
-	<!-- 	<input type="hidden" name="redirectUrl" value="/article/detail?id=#id"> -->
-	<%-- 	<input type="hidden" name="articleId" value="${article.id}"> --%>
-	<div class="table-box con">
+	<!-- <form method="POST" class="form1" action="./doWriteReply"  Ajax화로 method와 action이 의미없어짐 -->
+	<!-- Ajax화로 form은 이제 발송용으로 사용되지 않는다. -->
+	<form class="form1 table-box con"
+		onsubmit="ArticleWriteReplyFrom__submit(this); return false;">
+		<!-- 	<input type="hidden" name="redirectUrl" value="/article/detail?id=#id"> -->
+		<%-- 	<input type="hidden" name="articleId" value="${article.id}"> --%>
 		<table>
 			<tbody>
 				<tr>
@@ -120,7 +125,7 @@
 					<td>
 						<div class="form-control-box">
 							<textarea class="height-100px" placeholder="내용을 입력해주세요."
-								name="body" maxlength="2000" autofocus></textarea>
+								name="body" maxlength="300" autofocus></textarea>
 						</div>
 					</td>
 				</tr>
@@ -132,8 +137,8 @@
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</form>
+	</form>
+</c:if>
 
 <h2 class="con">댓글 리스트</h2>
 
@@ -141,14 +146,14 @@
 var ArticleReply__lastLoadedArticleReplyId = 0;
 
 function ArticleReply__loadList() {
-	$.get('./getForPrintArticleRepliesRs',{
-			id : ${param.id},
+	$.get('./getForPrintArticleRepliesRs',{   // get : select 하는 것.
+			id : param.id, //${param.id}, head에 구워?놓았기 때문에 중괄호 없이 사용 가능
 			from : ArticleReply__lastLoadedArticleReplyId + 1 
 		}, function(data) {
-			data.articleReplies = data.articleReplies.reverse();
+			data.articleReplies = data.body.articleReplies.reverse();
 			for ( var i = 0; i < data.articleReplies.length; i++ ) {
 				var articleReply = data.articleReplies[i];
-				ArticleReply__drawReply(articleReply);
+				ArticleReplyList__drawReply(articleReply);
 
 				ArticleReply__lastLoadedArticleReplyId = articleReply.id;
 			}
@@ -162,7 +167,7 @@ function ArticleReply__loadList() {
 var ArticleReply__$listTbody;
 
 
-function ArticleReply__drawReply(articleReply) {
+function ArticleReplyList__drawReply(articleReply) {
 
 
 	var html = $('.template-box-1 tbody').html(); 
@@ -170,6 +175,7 @@ function ArticleReply__drawReply(articleReply) {
 
 	html = replaceAll(html, "{$번호}", articleReply.id);
 	html = replaceAll(html, "{$날짜}", articleReply.regDate);
+ 	html = replaceAll(html, "{$작성자}", articleReply.extra.writer);
 	html = replaceAll(html, "{$내용}", articleReply.body);
 				
 			
@@ -328,15 +334,14 @@ function ArticleReply__delete(obj) {
 			id: replyId
 		},
 		function(data) { // 답장을 받았을 때 내가 해야 하는 행동.
-			
 			$tr.attr('data-loading', 'N');
-			$tr.attr('data-loading-delete', 'N');	
-
-			$tr.remove();  
+			$tr.attr('data-loading-delete', 'N');
 
 			// 아래는 회원 기능이 없기 때문에 삭제할 수 없어서 위에 만들어버림
 			if ( data.resultCode.substr(0, 2) == 'S-' ) {
-				$tr.remove();  // 아작스 실패할 수도 있으니까 $tr.attr 다음에 remove! 성공한다면 ! 
+				
+				$tr.remove();  // 아작스 실패할 수도 있으니까 $tr.attr 다음에 remove! 성공한다면 !
+				 
 			}
 	 		
 			else {
@@ -344,10 +349,7 @@ function ArticleReply__delete(obj) {
 					alert(data.msg);
 				}
 			}
-		},
-		'json'
-	);
-
+		}, 'json' );
 	
 }
 
@@ -363,24 +365,25 @@ function ArticleReply__delete(obj) {
 			<tr data-article-reply-id="{$번호}">
 				<td>{$번호}</td>
 				<td>{$날짜}</td>
+				<td>{$작성자}</td>
 				<td>
-					<div class="reply-body-text modify-mode-none">
-						{$내용}
-					</div>
+					<div class="reply-body-text modify-mode-none">{$내용}</div>
 					<div class="modify-mode-block">
-<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
-						<form onsubmit="ArticleReply__submitModifyReplyForm(this); return false;"> 
-							 <textarea  name="body" class="height-100px">{$내용}</textarea>
-							<br />
-							<input class="loading-none"type="submit" value="수정"/>
+						<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
+						<form
+							onsubmit="ArticleReply__submitModifyReplyForm(this); return false;">
+							<textarea name="body" class="height-100px">{$내용}</textarea>
+							<br /> <input class="loading-none" type="submit" value="수정" />
 						</form>
-					</div> 
+					</div>
 				</td>
 				<td><span class="loading-delete-inline">삭제중입니다...</span> <a
 					class="loading-none" href="#"
 					onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
-					<a class="loading-none modify-mode-none" href="#" onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
-					<a class="loading-none modify-mode-inline" href="#" onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
+					<a class="loading-none modify-mode-none" href="#"
+					onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
+					<a class="loading-none modify-mode-inline" href="#"
+					onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
 				</td>
 			</tr>
 		</tbody>
@@ -398,13 +401,15 @@ function ArticleReply__delete(obj) {
 		<colgroup>
 			<col width="100" />
 			<col width="200" />
-			<col width="700" />
+			<col width="200" />
+			<col width="600" />
 			<col width="150" />
 		</colgroup>
 		<thead>
 			<tr>
 				<th>번호</th>
 				<th>날짜</th>
+				<th>작성자</th>
 				<th>내용</th>
 				<th>비고</th>
 
@@ -450,18 +455,13 @@ function ArticleReply__delete(obj) {
 	justify-content: space-around;
 }
 
-
-
 a:hover {
 	color: red;
 }
 
-
 textarea {
-	width:100%;
-} 
-
-
+	width: 100%;
+}
 
 .article-reply-list-box tr .loading-delete-inline {
 	display: none;
@@ -480,33 +480,27 @@ textarea {
 }
 
 .article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-none {
-	display:none;
+	display: none;
 }
 
 .article-reply-list-box tr .modify-mode-inline {
-	display:none;
+	display: none;
 }
 
 .article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-inline {
-	display:inline;
+	display: inline;
 }
 
-
-
-
 .article-reply-list-box tr .modify-mode-block {
-	display:none;
+	display: none;
 }
 
 .article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-block {
-	display:block;
+	display: block;
 }
-
-
-
 </style>
 
 
 
 
-<%@ include file="../part/foot.jspf"%> 
+<%@ include file="../part/foot.jspf"%>

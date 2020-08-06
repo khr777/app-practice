@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
 import com.sbs.jhs.at.dto.ArticleReply;
+import com.sbs.jhs.at.dto.ResultData;
 import com.sbs.jhs.at.service.ArticleService;
 import com.sbs.jhs.at.util.Util;
 
@@ -46,7 +48,6 @@ public class ArticleController {
 			searchKeyword = (String) param.get("searchKeyword");
 
 		}
-		System.out.println("검색어 : " + searchKeyword);
 
 		int page = 1;
 		if (param.get("page") != null) {
@@ -90,9 +91,9 @@ public class ArticleController {
 
 		model.addAttribute("article", article);
 
-		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(article.getId());
+		//List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(article.getId());
 
-		model.addAttribute("articleReplies", articleReplies); // 굽는다.
+		//model.addAttribute("articleReplies", articleReplies); // 굽는다.
 		return "article/detail";
 	}
 
@@ -102,8 +103,8 @@ public class ArticleController {
 	}
 
 	@RequestMapping("/usr/article/doWrite")
-	public String doWrite(@RequestParam Map<String, Object> param) {
-
+	public String doWrite(@RequestParam Map<String, Object> param, HttpServletRequest request) {
+		param.put("memberId", request.getAttribute("loginedMemberId"));
 		int newArticleId = articleService.write(param);
 
 		String redirectUrl = (String) param.get("redirectUrl");
@@ -125,8 +126,7 @@ public class ArticleController {
 	@RequestMapping("/usr/article/doWriteReply")
 	public String doWriteReply(@RequestParam Map<String, Object> param) {
 
-		System.out.println("param이 담고 있는 것은? : " + param);
-		Map<String, Object> rs = articleService.writeReply(param);
+		int newArticleReplyId = articleService.writeReply(param);
 
 		int articleId = Util.getAsInt((String) param.get("articleId"));
 
@@ -243,72 +243,57 @@ public class ArticleController {
 	}
 	
 	@RequestMapping("/usr/article/doWriteReplyAjax")
-	@ResponseBody
-	public Map<String, Object> doWriteReplyAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
-
-		Map<String, Object> rs = articleService.writeReply(param);
-
-
-		/*
-		 * String redirectUrl = (String) param.get("redirectUrl"); redirectUrl =
-		 * redirectUrl.replace("#id", articleId + "");
-		 */
-
-		// Spring Boot의 특징 : "redirect:" 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다.
-		return rs;
+	@ResponseBody // Ajax는 이걸 꼭 해주어야 한다.
+	public ResultData doWriteReplyAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
+		Map<String, Object> rsDataBody = new HashMap<>();
+		param.put("memberId", request.getAttribute("loginedMemberId"));
+		int newArticleReplyId =  articleService.writeReply(param);
+		rsDataBody.put("articleReplyId", newArticleReplyId);
+		
+		
+		return new ResultData("S-1", String.format("%d번 댓글이 생성되었습니다.", newArticleReplyId));
 	}
+	
+	
+	
+	
+	
+	/*
+	 * // Rs 의미 : Map 을 return 한다는 의미.
+	 * 
+	 * @RequestMapping("/usr/article/getForPrintArticleRepliesRs")
+	 * 
+	 * @ResponseBody public Map<String, Object> getForPrintArticleRepliesRs(int id,
+	 * int from) { List<ArticleReply> articleReplies =
+	 * articleService.getForPrintArticleReplies(id, from);
+	 * System.out.println(articleReplies); Map<String, Object> rs = new HashMap<>();
+	 * rs.put("resultCode", "S-1"); rs.put("msg", String.format("총 %d개의 댓글이 있습니다.",
+	 * articleReplies.size())); rs.put("articleReplies", articleReplies);
+	 * 
+	 * 
+	 * return rs; }
+	 * 
+	 */
+	
 	// Rs 의미 : Map 을 return 한다는 의미.
 	@RequestMapping("/usr/article/getForPrintArticleRepliesRs") 
 	@ResponseBody
-	public Map<String, Object> getForPrintArticleRepliesRs(int id, int from) {
-		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(id, from);
-		System.out.println(articleReplies);
-		Map<String, Object> rs = new HashMap<>();
-		rs.put("resultCode", "S-1");
-		rs.put("msg", String.format("총 %d개의 댓글이 있습니다.", articleReplies.size()));
-		rs.put("articleReplies", articleReplies);
+	public ResultData getForPrintArticleRepliesRs(@RequestParam Map<String, Object> param, HttpServletRequest request) {
+		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(param);
+		Map<String, Object> rsDataBody = new HashMap<>();
+		rsDataBody.put("articleReplies", articleReplies);
 		
 		
-		return rs;
+		return new ResultData("S-1", String.format("%d개의 댓글을 불러왔습니다.", articleReplies.size()),rsDataBody );
 	}
 	@RequestMapping("/usr/article/doDeleteReplyAjax")
 	@ResponseBody
-	public Map<String, Object> doDeleteReply(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
+	public ResultData doDeleteReply(@RequestParam Map<String, Object> param, int id) {
 		
-		
-		System.out.println("id " + id);
-		// 댓글 삭제 가능한지 물어보는 메서드
-		// Map<String, Object> articleReplyDeleteAvailable =
-		// articleService.getArticleReplyDeleteAvailable(id);
 
-		// Map<String, Object> rs = articleService.softDeleteArticleReply(id);
+		articleService.softDeleteArticleReply(id);
 
-		//Map<String, Object> rs = articleService.softDeleteArticleReply(Util.getAsInt(id));
-		Map<String, Object> rs = articleService.softDeleteArticleReply(id);
-
-		/*
-		 * String redirectUrl = (String) param.get("redirectUrl");
-		 * System.out.println("redirectUrl : " + redirectUrl); int articleId =
-		 * Util.getAsInt(param.get("articleId")); redirectUrl =
-		 * redirectUrl.replace("#id", articleId + "");
-		 * System.out.println("redirectUrl : " + redirectUrl);
-		 * redirectUrl 기능을 사용하지 않아도 메서드를 열어두면 보여지지 않는 null 오류로 기능을 못함 
-		 * 
-		 */
-		// ---------------- 혹시 articleId 형 변환을 해야 할 수도???????????
-
-		/*
-		 * String msg = id + "번 게시물이 삭제되었습니다.";
-		 * 
-		 * StringBuilder sb = new StringBuilder();
-		 * 
-		 * sb.append("alert('" + msg + "');"); sb.append("location.replace('./list');");
-		 * 
-		 * sb.insert(0, "<script>"); sb.append("</script>");
-		 * 
-		 * return sb.toString();
-		 */
-		
+		  
 		// ★ 시간 지연을 걸 수 있음.
 		// Ajax 너무 빨라서 "삭제중입니다.. 안 보일 때 사용해서 참고할 것.
 		try {
@@ -319,7 +304,7 @@ public class ArticleController {
 		
 		
 		
-		return rs;
+		return new ResultData("S-1", String.format("%d번 댓글을 삭제하였습니다.",id ));
 	}
 	
 	@RequestMapping("/usr/article/doModifyReplyAjax")
