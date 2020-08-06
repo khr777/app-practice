@@ -24,6 +24,13 @@
 <!-- 공통 JS -->
 <script src="/resource/common.js"></script> 
 <!-- jQuery를 불러온 다음에 공통 JS를 불러와야 한다! -->
+
+<!-- 이렇게하면 자바스크립트에서 parameter를 받아올 수 있다. 원래는 js는 parameter를 받을 수 없음.. -->
+<script>
+var param = ${paramJson};
+</script>
+
+
 </head>
 <body>
 	<div class="outer-box">
