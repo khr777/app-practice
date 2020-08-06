@@ -5,6 +5,23 @@
 <%@ include file="../part/head.jspf"%>
 
 
+
+
+
+
+
+<script>
+	var ArticleReply__loadListDelay = 1000;
+
+
+	//임시
+	//ArticleReply__loadListDelay = 5000;
+	
+</script>
+
+
+
+
 <div class="table-box con">
 	<table>
 		<colgroup>
@@ -40,10 +57,11 @@
 			<input type="button" onclick="location.href='../article/list'"
 				value="뒤로가기" />
 		</div>
+
 		<div class="modifyAndDelete">
-			<input type="button"
+			<input type="button" 
 				onclick="location.href='../article/modify?id=${article.id}'"
-				value="수정" /> <input type="button"
+				value="수정" /> <input type="button" 
 				onclick="location.href='../article/delete?id=${article.id}'"
 				value="삭제" />
 		</div>
@@ -134,7 +152,8 @@ function ArticleReply__loadList() {
 
 				ArticleReply__lastLoadedArticleReplyId = articleReply.id;
 			}
-			setTimeout(ArticleReply__loadList, 1000);
+			setTimeout(ArticleReply__loadList, ArticleReply__loadListDelay);
+			//setTimeout(ArticleReply__loadList, 1000);  너무 정신 사나워서 delay 로 변경함
 			//setTimeout 은 함수가 끝날 때 단 한번만 실행된다! 	 
 			//setInterval 은 계속!! 실행해주는 것.
 		},'json' );
@@ -190,16 +209,45 @@ $(function() {
 	// Ajax로 전송을 하고 data를 받은 후에 리스팅을 해야하는데, 데이터를 받기도 전에 리스팅을 해버리는 문제가 있음.(setTimeout으로 문제 해결)
 });
 
-
+// (obj) a태그를 조종할 수 있는 리모콘 버튼이다.
 function ArticleReply__delete(obj) {
-	alert(obj);
+	var $clickedBtn = $(obj);  // obj 버튼을 -> $(obj); 이런식으로 만들어서 var에 담으면? 관리가 편해진다.
+	// $clickedBtn : 교장 ( 교장은 학생을 관리한다.)
+
+	//$clickedBtn.remove();  이것을 할게 아니라 예시만 들어주시고 삭제하셨음.
+	// $clickedBtn이 관리하고 있는 학생은 a태그(삭제) 이다. 해당 a태그에서 함수 호출하고 this 자신을 넘겼기 때문에.
+
+	// parent 필요량 만큼 붙여주기 귀찮
+	//var $tr = $clickedBtn.parent().parent(); // a태그의 부모_td의 부모_tr !!!!
+	
+	var $tr = $clickedBtn.closest('tr'); // 가장 가까운 조상 중에서 tr 가져와라.
+	
+	//$tr.remove();
+
+	var replyId = parseInt($tr.attr('data-article-reply-id'));
+
+	$tr.attr('data-loading', 'Y');
+	
+	$.post(
+		'./doDeleteReplyAjax',  //편지 받는 사람
+		{
+			id: replyId
+		},
+		function(data) { // 답장을 받았을 때 내가 해야 하는 행동.
+			$tr.remove();
+			$tr.attr('data-loading', 'N');
+		},
+		'json'
+	);
+
+	
 }
 
 
 
 </script>
 
-
+<!-- 		class="loading-none" 의미 : 로딩 중일 때 안보여야 하는 버튼 -->
 <!-- 수정, 삭제 버튼에서 테스트 할 때 버튼 클릭할 때마다 맨 위로 이동하는 것을 onclick="return false;"로 잠시 막을 수 있다. -->
 <div class="template-box template-box-1">
 	<table border="1">
@@ -209,8 +257,9 @@ function ArticleReply__delete(obj) {
 				<td>{$날짜}</td>
 				<td>{$내용}</td>
 				<td>
-					<a href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this) } return false;">삭제</a> 
-					<a href="#" onclick="return false;">수정</a>
+					<span class="loading-inline">삭제중입니다...</span>
+					<a class="loading-none" href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a> 
+					<a class="loading-none" href="#" onclick="return false;">수정</a>
 				</td>
 			</tr>
 		</tbody>
@@ -283,6 +332,24 @@ function ArticleReply__delete(obj) {
 a:hover {
 	color: red;
 }
+
+
+.article-reply-list-box tr .loading-inline {
+	display:none;
+	font-weight:bold;
+	color:red;
+}
+
+
+.article-reply-list-box tr[data-loading="Y"] .loading-none {
+	display:none;
+}
+
+.article-reply-list-box tr[data-loading="Y"] .loading-inline {
+	display:inline;
+}
+
+
 </style>
 
 

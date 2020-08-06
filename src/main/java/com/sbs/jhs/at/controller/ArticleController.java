@@ -271,6 +271,59 @@ public class ArticleController {
 		
 		return rs;
 	}
+	@RequestMapping("/article/doDeleteReplyAjax")
+	@ResponseBody
+	public Map<String, Object> doDeleteReply(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
+		
+		
+		System.out.println("id " + id);
+		// 댓글 삭제 가능한지 물어보는 메서드
+		// Map<String, Object> articleReplyDeleteAvailable =
+		// articleService.getArticleReplyDeleteAvailable(id);
+
+		// Map<String, Object> rs = articleService.softDeleteArticleReply(id);
+
+		//Map<String, Object> rs = articleService.softDeleteArticleReply(Util.getAsInt(id));
+		Map<String, Object> rs = articleService.softDeleteArticleReply(id);
+
+		/*
+		 * String redirectUrl = (String) param.get("redirectUrl");
+		 * System.out.println("redirectUrl : " + redirectUrl); int articleId =
+		 * Util.getAsInt(param.get("articleId")); redirectUrl =
+		 * redirectUrl.replace("#id", articleId + "");
+		 * System.out.println("redirectUrl : " + redirectUrl);
+		 * redirectUrl 기능을 사용하지 않아도 메서드를 열어두면 보여지지 않는 null 오류로 기능을 못함 
+		 * 
+		 */
+		// ---------------- 혹시 articleId 형 변환을 해야 할 수도???????????
+
+		/*
+		 * String msg = id + "번 게시물이 삭제되었습니다.";
+		 * 
+		 * StringBuilder sb = new StringBuilder();
+		 * 
+		 * sb.append("alert('" + msg + "');"); sb.append("location.replace('./list');");
+		 * 
+		 * sb.insert(0, "<script>"); sb.append("</script>");
+		 * 
+		 * return sb.toString();
+		 */
+		
+		// ★ 시간 지연을 걸 수 있음.
+		// Ajax 너무 빨라서 "삭제중입니다.. 안 보일 때 사용해서 참고할 것.
+		
+		
+		
+		try {
+			Thread.sleep(1000);  // 3초 쉬는거.  3초 잠재우는 것.
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		return rs;
+	}
 
 
 }

@@ -49,7 +49,7 @@ public interface ArticleService {
 	public ArticleReply getArticleReply(int id);
 
 
-	public Map<String, Object> softDeleteArticleReply(int id);
+	public Map<String, Object> softDeleteArticleReply( int id);
 
 
 	public ArticleReply getForPrintArticleReplyById(int id);

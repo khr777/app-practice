@@ -129,7 +129,7 @@
 		WHERE id = #{id}
 	</select>
 	
-	<update id="softDeleteArticleReply" parameterType="map">
+	<update id="softDeleteArticleReply" >
 		UPDATE articleReply
 		SET	delStatus = 1,
 		delDate = NOW(),
