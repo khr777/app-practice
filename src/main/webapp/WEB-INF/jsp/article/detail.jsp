@@ -59,9 +59,9 @@
 		</div>
 
 		<div class="modifyAndDelete">
-			<input type="button" 
+			<input type="button"
 				onclick="location.href='../article/modify?id=${article.id}'"
-				value="수정" /> <input type="button" 
+				value="수정" /> <input type="button"
 				onclick="location.href='../article/delete?id=${article.id}'"
 				value="삭제" />
 		</div>
@@ -209,6 +209,99 @@ $(function() {
 	// Ajax로 전송을 하고 data를 받은 후에 리스팅을 해야하는데, 데이터를 받기도 전에 리스팅을 해버리는 문제가 있음.(setTimeout으로 문제 해결)
 });
 
+
+
+function ArticleReply__enableModifyMode(obj) {
+	var $clickedBtn = $(obj);
+	var $tr = $clickedBtn.closest('tr');
+
+	var $replyBodyText = $tr.find('.reply-body-text');
+	var $textarea = $tr.find('form textarea');
+
+	$textarea.val($replyBodyText.text().trim());
+
+
+	$tr.attr('data-modify-mode', 'Y');
+
+	
+}
+
+function ArticleReply__disableModifyMode(obj) {
+	
+	var $clickedBtn = $(obj);
+	var $tr = $clickedBtn.closest('tr');
+
+	$tr.attr('data-modify-mode', 'N');
+		
+}
+
+
+
+
+function ArticleReply__submitModifyReplyForm(form) {
+
+	var $tr = $(form).closest('tr');
+	form.body.value = form.body.value.trim();
+
+	if ( form.body.value.length == 0 ) {
+		alert('댓글내용을 입력 해주세요.');
+		form.body.focus();
+
+		return false;
+	}
+
+	var replyId = parseInt($tr.attr('data-article-reply-id'));
+	var body = form.body.value;
+
+	$tr.attr('data-loading', 'Y');
+	$tr.attr('data-loading-modify', 'Y');
+
+	
+
+	$.post('./doModifyReplyAjax', {
+			id: replyId,
+			body: body
+		}, function(data) {
+			$tr.attr('data-loading', 'N');
+			$tr.attr('data-loading-modify', 'N');
+
+			
+			ArticleReply__disableModifyMode(form);  
+
+			var $replyBodyText = $tr.find('.reply-body-text');
+			var $textarea = $tr.find('form textarea');
+
+			$replyBodyText.text($textarea.val());
+
+			// 아래는 회원 기능이 없기 때문에 삭제할 수 없어서 위에 만들어버림
+			if ( data.resultCode.substr(0, 2) == 'S-' ) {
+				
+				ArticleReply__disableModifyMode(form); 
+
+				var $replyBodyText = $tr.find('.reply-body-text');
+				var $textarea = $tr.find('form textarea');
+
+				$replyBodyText.text($textarea.val());
+			}
+	 		
+			else {
+				if ( data.msg ) {
+					alert(data.msg);
+				}
+			}
+		}
+	);
+
+
+
+	
+}
+
+
+
+
+
+
 // (obj) a태그를 조종할 수 있는 리모콘 버튼이다.
 function ArticleReply__delete(obj) {
 	var $clickedBtn = $(obj);  // obj 버튼을 -> $(obj); 이런식으로 만들어서 var에 담으면? 관리가 편해진다.
@@ -227,6 +320,7 @@ function ArticleReply__delete(obj) {
 	var replyId = parseInt($tr.attr('data-article-reply-id'));
 
 	$tr.attr('data-loading', 'Y');
+	$tr.attr('data-loading-delete', 'Y');
 	
 	$.post(
 		'./doDeleteReplyAjax',  //편지 받는 사람
@@ -234,8 +328,22 @@ function ArticleReply__delete(obj) {
 			id: replyId
 		},
 		function(data) { // 답장을 받았을 때 내가 해야 하는 행동.
-			$tr.remove();
+			
 			$tr.attr('data-loading', 'N');
+			$tr.attr('data-loading-delete', 'N');	
+
+			$tr.remove();  
+
+			// 아래는 회원 기능이 없기 때문에 삭제할 수 없어서 위에 만들어버림
+			if ( data.resultCode.substr(0, 2) == 'S-' ) {
+				$tr.remove();  // 아작스 실패할 수도 있으니까 $tr.attr 다음에 remove! 성공한다면 ! 
+			}
+	 		
+			else {
+				if ( data.msg ) {
+					alert(data.msg);
+				}
+			}
 		},
 		'json'
 	);
@@ -255,11 +363,24 @@ function ArticleReply__delete(obj) {
 			<tr data-article-reply-id="{$번호}">
 				<td>{$번호}</td>
 				<td>{$날짜}</td>
-				<td>{$내용}</td>
 				<td>
-					<span class="loading-inline">삭제중입니다...</span>
-					<a class="loading-none" href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a> 
-					<a class="loading-none" href="#" onclick="return false;">수정</a>
+					<div class="reply-body-text modify-mode-none">
+						{$내용}
+					</div>
+					<div class="modify-mode-block">
+<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
+						<form onsubmit="ArticleReply__submitModifyReplyForm(this); return false;"> 
+							 <textarea  name="body" class="height-100px">{$내용}</textarea>
+							<br />
+							<input class="loading-none"type="submit" value="수정"/>
+						</form>
+					</div> 
+				</td>
+				<td><span class="loading-delete-inline">삭제중입니다...</span> <a
+					class="loading-none" href="#"
+					onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
+					<a class="loading-none modify-mode-none" href="#" onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
+					<a class="loading-none modify-mode-inline" href="#" onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
 				</td>
 			</tr>
 		</tbody>
@@ -329,25 +450,58 @@ function ArticleReply__delete(obj) {
 	justify-content: space-around;
 }
 
+
+
 a:hover {
 	color: red;
 }
 
 
-.article-reply-list-box tr .loading-inline {
-	display:none;
-	font-weight:bold;
-	color:red;
-}
+textarea {
+	width:100%;
+} 
 
+
+
+.article-reply-list-box tr .loading-delete-inline {
+	display: none;
+	font-weight: bold;
+	color: red;
+}
 
 .article-reply-list-box tr[data-loading="Y"] .loading-none {
+	display: none;
+}
+
+/* loading이면서 delete-loading 일 때 */
+.article-reply-list-box tr[data-loading="Y"][data-loading-delete="Y"] .loading-delete-inline
+	{
+	display: inline;
+}
+
+.article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-none {
 	display:none;
 }
 
-.article-reply-list-box tr[data-loading="Y"] .loading-inline {
+.article-reply-list-box tr .modify-mode-inline {
+	display:none;
+}
+
+.article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-inline {
 	display:inline;
 }
+
+
+
+
+.article-reply-list-box tr .modify-mode-block {
+	display:none;
+}
+
+.article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-block {
+	display:block;
+}
+
 
 
 </style>
@@ -355,4 +509,4 @@ a:hover {
 
 
 
-<%@ include file="../part/foot.jspf"%>
+<%@ include file="../part/foot.jspf"%> 

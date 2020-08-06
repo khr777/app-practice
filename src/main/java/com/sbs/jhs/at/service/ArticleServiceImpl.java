@@ -127,9 +127,14 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	
 	@Override
-	public int modifyReply(@RequestParam Map<String, Object> param, int id) {
-		int a = articleDao.modifyReply(param);
-		return a;
+	public Map<String, Object> modifyReply(@RequestParam Map<String, Object> param, int id) {
+		
+		articleDao.modifyReply(param);
+		
+		Map<String, Object> rs = new HashMap<>();
+		//rs.put("msg", String.format("%d번 댓글을 삭제했습니다.", id));
+		rs.put("resultCode", "S-1");
+		return rs;
 	}
 
 	@Override

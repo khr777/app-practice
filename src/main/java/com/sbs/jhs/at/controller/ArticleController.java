@@ -311,9 +311,6 @@ public class ArticleController {
 		
 		// ★ 시간 지연을 걸 수 있음.
 		// Ajax 너무 빨라서 "삭제중입니다.. 안 보일 때 사용해서 참고할 것.
-		
-		
-		
 		try {
 			Thread.sleep(1000);  // 3초 쉬는거.  3초 잠재우는 것.
 		} catch (InterruptedException e) {
@@ -324,6 +321,30 @@ public class ArticleController {
 		
 		return rs;
 	}
+	
+	@RequestMapping("/article/doModifyReplyAjax")
+	@ResponseBody
+	public Map<String, Object> doModifyReplyAjax(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
+
+		
+		
+		Map<String, Object> rs = articleService.modifyReply(param, id);
+		
+		//임시용 
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		return rs;
+
+	}
+	
+
 
 
 }

@@ -55,7 +55,7 @@ public interface ArticleService {
 	public ArticleReply getForPrintArticleReplyById(int id);
 
 
-	public int modifyReply(@RequestParam Map<String, Object> param, int id);
+	public Map<String, Object> modifyReply(@RequestParam Map<String, Object> param, int id);
 
 
 	public List<ArticleReply> getForPrintArticleReplies(int id, int from);
