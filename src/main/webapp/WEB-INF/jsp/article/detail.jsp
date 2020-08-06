@@ -134,6 +134,9 @@ function ArticleReply__loadList() {
 
 				ArticleReply__lastLoadedArticleReplyId = articleReply.id;
 			}
+			setTimeout(ArticleReply__loadList, 1000);
+			//setTimeout 은 함수가 끝날 때 단 한번만 실행된다! 	 
+			//setInterval 은 계속!! 실행해주는 것.
 		},'json' );
 }
 
@@ -141,6 +144,20 @@ var ArticleReply__$listTbody;
 
 
 function ArticleReply__drawReply(articleReply) {
+
+
+	var html = $('.template-box-1 tbody').html(); 
+	//자바스크립트에서 해당 template를 찾아서 html로 사용하겠다..? 는 의미.
+
+	html = replaceAll(html, "{$번호}", articleReply.id);
+	html = replaceAll(html, "{$날짜}", articleReply.regDate);
+	html = replaceAll(html, "{$내용}", articleReply.body);
+				
+			
+			
+			
+	
+	/* 
 	var html = '';
 	html += '<tr data-article-reply-id="' + articleReply.id + '"">';
 	html += '<td>' + articleReply.id + '</td>';
@@ -151,7 +168,7 @@ function ArticleReply__drawReply(articleReply) {
 	html += '<a href="#">수정</a>';
 	html += '</td>';
 	html += '</tr>';
-	
+	*/  
 
 
 
@@ -162,11 +179,49 @@ function ArticleReply__drawReply(articleReply) {
 $(function() {
 
 	ArticleReply__$listTbody = $('.article-reply-list-box > table tbody');
-	//ArticleReply__loadList();
 
-	setInterval(ArticleReply__loadList, 1000);
+
+	// 상세보기 페이지로 이동하면 바로 리스트를 불러오는 함수.
+	ArticleReply__loadList();
+
+	// 상세보기 페이지로 이동하면 1초 있다가 계속 리스팅 해주는. 
+	// 그래서 처음 페이지에 접속해도 1초 있다가 리스트를 불러오므로  ArticleReply__loadList();를 먼저 호출
+	//setInterval(ArticleReply__loadList, 1000);
+	// Ajax로 전송을 하고 data를 받은 후에 리스팅을 해야하는데, 데이터를 받기도 전에 리스팅을 해버리는 문제가 있음.(setTimeout으로 문제 해결)
 });
+
+
+function ArticleReply__delete(obj) {
+	alert(obj);
+}
+
+
+
 </script>
+
+
+<!-- 수정, 삭제 버튼에서 테스트 할 때 버튼 클릭할 때마다 맨 위로 이동하는 것을 onclick="return false;"로 잠시 막을 수 있다. -->
+<div class="template-box template-box-1">
+	<table border="1">
+		<tbody>
+			<tr data-article-reply-id="{$번호}">
+				<td>{$번호}</td>
+				<td>{$날짜}</td>
+				<td>{$내용}</td>
+				<td>
+					<a href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this) } return false;">삭제</a> 
+					<a href="#" onclick="return false;">수정</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+
+
+
+
 
 <div class="article-reply-list-box table-box con">
 	<table>

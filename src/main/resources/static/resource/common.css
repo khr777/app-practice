@@ -76,6 +76,10 @@ label[for] {
 	max-width: 1200px;
 }
 
+.template-box {
+	display:none;
+}
+
 .page-title-box {
 	margin-top:30px;
 	margin-bottom:30px;
