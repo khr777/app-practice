@@ -26,7 +26,7 @@ public class ArticleController {
 	@Autowired
 	private ArticleService articleService;
 
-	@RequestMapping("/article/list")
+	@RequestMapping("/usr/article/list")
 	public String showList(Model model, @RequestParam Map<String, Object> param) {
 
 		String searchKeywordType = "";
@@ -73,7 +73,7 @@ public class ArticleController {
 	// public String showDetail(Model model, int id) { 이렇게 해도 된다. "int id"로
 	// 실무에서 @RequestParam 방법을 많이 사용한다. (int id 방법도 있지만)
 	// 모든 parameter가 'param'에 다 들어가 있다. 꺼내 쓰기만 하면 된다.
-	@RequestMapping("/article/detail")
+	@RequestMapping("/usr/article/detail")
 	public String showDetail(Model model, @RequestParam Map<String, Object> param) {
 
 		
@@ -96,12 +96,12 @@ public class ArticleController {
 		return "article/detail";
 	}
 
-	@RequestMapping("/article/write")
+	@RequestMapping("/usr/article/write")
 	public String showWrite(Model model) {
 		return "article/write";
 	}
 
-	@RequestMapping("/article/doWrite")
+	@RequestMapping("/usr/article/doWrite")
 	public String doWrite(@RequestParam Map<String, Object> param) {
 
 		int newArticleId = articleService.write(param);
@@ -122,7 +122,7 @@ public class ArticleController {
 		return "redirect:" + redirectUrl;
 	}
 
-	@RequestMapping("/article/doWriteReply")
+	@RequestMapping("/usr/article/doWriteReply")
 	public String doWriteReply(@RequestParam Map<String, Object> param) {
 
 		System.out.println("param이 담고 있는 것은? : " + param);
@@ -137,7 +137,7 @@ public class ArticleController {
 		return "redirect:" + redirectUrl;
 	}
 
-	@RequestMapping("/article/modify")
+	@RequestMapping("/usr/article/modify")
 	public String showModify(Model model, int id) {
 
 		Article article = articleService.getForPrintArticleById(id);
@@ -147,7 +147,7 @@ public class ArticleController {
 		return "article/modify";
 	}
 
-	@RequestMapping("/article/doModify")
+	@RequestMapping("/usr/article/doModify")
 	@ResponseBody
 	public String showDoModify(@RequestParam Map<String, Object> param, int id) {
 
@@ -167,7 +167,7 @@ public class ArticleController {
 
 	}
 
-	@RequestMapping("/article/delete")
+	@RequestMapping("/usr/article/delete")
 	@ResponseBody
 	public String showDelete(int id) {
 
@@ -187,7 +187,7 @@ public class ArticleController {
 
 	}
 
-	@RequestMapping("/article/doDeleteReply")
+	@RequestMapping("/usr/article/doDeleteReply")
 	public String doDeleteReply(Model model, @RequestParam Map<String, Object> param) {
 
 		// 댓글 삭제 가능한지 물어보는 메서드
@@ -219,7 +219,7 @@ public class ArticleController {
 		return "redirect:" + redirectUrl;
 	}
 
-	@RequestMapping("/article/modifyReply")
+	@RequestMapping("/usr/article/modifyReply")
 	public String showModifyReply(Model model, int id) {
 
 		ArticleReply articleReply = articleService.getForPrintArticleReplyById(id);
@@ -229,7 +229,7 @@ public class ArticleController {
 		return "article/modifyReply";
 	}
 
-	@RequestMapping("/article/doModifyReply")
+	@RequestMapping("/usr/article/doModifyReply")
 	public String doModifyReply(@RequestParam Map<String, Object> param, int id) {
 
 		
@@ -242,7 +242,7 @@ public class ArticleController {
 
 	}
 	
-	@RequestMapping("/article/doWriteReplyAjax")
+	@RequestMapping("/usr/article/doWriteReplyAjax")
 	@ResponseBody
 	public Map<String, Object> doWriteReplyAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
 
@@ -258,7 +258,7 @@ public class ArticleController {
 		return rs;
 	}
 	// Rs 의미 : Map 을 return 한다는 의미.
-	@RequestMapping("/article/getForPrintArticleRepliesRs") 
+	@RequestMapping("/usr/article/getForPrintArticleRepliesRs") 
 	@ResponseBody
 	public Map<String, Object> getForPrintArticleRepliesRs(int id, int from) {
 		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(id, from);
@@ -271,7 +271,7 @@ public class ArticleController {
 		
 		return rs;
 	}
-	@RequestMapping("/article/doDeleteReplyAjax")
+	@RequestMapping("/usr/article/doDeleteReplyAjax")
 	@ResponseBody
 	public Map<String, Object> doDeleteReply(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
 		
@@ -322,7 +322,7 @@ public class ArticleController {
 		return rs;
 	}
 	
-	@RequestMapping("/article/doModifyReplyAjax")
+	@RequestMapping("/usr/article/doModifyReplyAjax")
 	@ResponseBody
 	public Map<String, Object> doModifyReplyAjax(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
 
