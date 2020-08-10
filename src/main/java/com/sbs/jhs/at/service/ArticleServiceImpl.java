@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sbs.jhs.at.dao.ArticleDao;
 import com.sbs.jhs.at.dto.Article;
-import com.sbs.jhs.at.dto.ArticleReply;
+import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.Member;
+import com.sbs.jhs.at.dto.ResultData;
 import com.sbs.jhs.at.util.Util;
 
 import lombok.extern.slf4j.Slf4j;
@@ -94,24 +95,24 @@ public class ArticleServiceImpl implements ArticleService {
 		return Util.getAsInt(param.get("id"));
 	}
 	/*
-	 * @Override public List<ArticleReply> getForPrintArticleReplies(int articleId)
+	 * @Override public List<Reply> getForPrintArticleReplies(int articleId)
 	 * { return articleDao.getForPrintArticleReplies(articleId); }
 	 */
 
 	@Override
-	public Map<String, Object> getArticleReplyDeleteAvailable(int id) {
-		ArticleReply articleReply = getArticleReply(id);
+	public Map<String, Object> getReplyDeleteAvailable(int id) {
+		Reply reply = getReply(id);
 		return null;
 	}
 
 	@Override
-	public ArticleReply getArticleReply(int id) {
-		return articleDao.getArticleReply(id);
+	public Reply getReply(int id) {
+		return articleDao.getReply(id);
 	}
 
 	@Override
-	public Map<String, Object> softDeleteArticleReply(int id) {
-		articleDao.softDeleteArticleReply(id);
+	public Map<String, Object> softDeleteReply(int id) {
+		articleDao.softDeleteReply(id);
 		Map<String, Object> rs = new HashMap<>();
 		rs.put("msg", String.format("%d번 댓글을 삭제했습니다.", id));
 		rs.put("resultCode", "S-1");
@@ -119,29 +120,19 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 
 	@Override
-	public ArticleReply getForPrintArticleReplyById(int id) {
-		ArticleReply articleReply = articleDao.getForPrintArticleReplyById(id);
+	public Reply getForPrintReplyById(int id) {
+		Reply reply = articleDao.getForPrintReplyById(id);
 
-		return articleReply;
+		return reply;
 	}
 	
+	
 	@Override
-	public Map<String, Object> modifyReply(@RequestParam Map<String, Object> param, int id) {
-		
-		articleDao.modifyReply(param);
-		
-		Map<String, Object> rs = new HashMap<>();
-		//rs.put("msg", String.format("%d번 댓글을 삭제했습니다.", id));
-		rs.put("resultCode", "S-1");
-		return rs;
-	}
-
-	@Override
-	public List<ArticleReply> getForPrintArticleReplies(@RequestParam Map<String, Object> param) {
+	public List<Reply> getForPrintReplies(@RequestParam Map<String, Object> param) {
 		
 		
 		
-		List<ArticleReply> articleReplies =  articleDao.getForPrintArticleRepliesFrom(param);
+		List<Reply> replies =  articleDao.getForPrintRepliesFrom(param);
 		
 		Member actor = (Member)param.get("actor");
 		
@@ -150,31 +141,31 @@ public class ArticleServiceImpl implements ArticleService {
 		
 		
 		
-		for ( ArticleReply articleReply : articleReplies ) {
+		for ( Reply reply : replies ) {
 			
 			// 출력용 부가데이터를 추가한다.
-			updateForPrintInfo(actor, articleReply);
+			updateForPrintInfo(actor, reply);
 		}
 		
-		return articleReplies;
+		return replies;
 		
 	}
 
-	private void updateForPrintInfo(Member actor, ArticleReply articleReply) {
-		articleReply.getExtra().put("actorCanDelete", actorCanDelete(actor, articleReply));
-		articleReply.getExtra().put("actorCanUpdate", actorCanUpdate(actor, articleReply));
+	public void updateForPrintInfo(Member actor, Reply reply) {
+		reply.getExtra().put("actorCanDelete", actorCanDelete(actor, reply));
+		reply.getExtra().put("actorCanModify", actorCanModify(actor, reply));
 		
 	}
 	
 	// 액터가 해당 댓글을 수정할 수 있는지를 알려준다.
-	private Object actorCanUpdate(Member actor, ArticleReply articleReply) {
-		 return actor != null && actor.getId() == articleReply.getMemberId() ? true : false;
+	public boolean actorCanModify(Member actor, Reply reply) {
+		 return actor != null && actor.getId() == reply.getMemberId() ? true : false;
 	}
 
 	
 	//액터가 해당 댓글을 삭제할 수 있는지를 알려준다.
-	private Object actorCanDelete(Member actor, ArticleReply articleReply) {
-		return actorCanUpdate(actor, articleReply);
+	public boolean actorCanDelete(Member actor, Reply reply) {
+		return actorCanModify(actor, reply);
 	}
 
 

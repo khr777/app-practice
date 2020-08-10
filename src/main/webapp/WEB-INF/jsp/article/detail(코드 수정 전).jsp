@@ -11,11 +11,11 @@
 
 
 <script>
-	var ArticleReply__loadListDelay = 3000;
+	var Reply__loadListDelay = 3000;
 
 
 	//임시
-	//ArticleReply__loadListDelay = 5000;
+	//Reply__loadListDelay = 5000;
 	
 </script>
 
@@ -141,64 +141,64 @@
 <h2 class="con">댓글 리스트</h2>
 
 <script>
-var ArticleReply__lastLoadedArticleReplyId = 0;
+var Reply__lastLoadedReplyId = 0;
 
-function ArticleReply__loadList() {
+function Reply__loadList() {
 	$.get('./getForPrintArticleRepliesRs',{   // get : select 하는 것.
 			id : param.id, //${param.id}, head에 구워?놓았기 때문에 중괄호 없이 사용 가능
-			from : ArticleReply__lastLoadedArticleReplyId + 1 
+			from : Reply__lastLoadedReplyId + 1 
 		}, function(data) {
 			data.articleReplies = data.body.articleReplies.reverse();
 			for ( var i = 0; i < data.articleReplies.length; i++ ) {
-				var articleReply = data.articleReplies[i];
-				ArticleReplyList__drawReply(articleReply);
+				var reply = data.articleReplies[i];
+				ReplyList__drawReply(reply);
 
-				ArticleReply__lastLoadedArticleReplyId = articleReply.id;
+				Reply__lastLoadedReplyId = reply.id;
 			}
-			setTimeout(ArticleReply__loadList, ArticleReply__loadListDelay);
-			//setTimeout(ArticleReply__loadList, 1000);  너무 정신 사나워서 delay 로 변경함
+			setTimeout(Reply__loadList, Reply__loadListDelay);
+			//setTimeout(Reply__loadList, 1000);  너무 정신 사나워서 delay 로 변경함
 			//setTimeout 은 함수가 끝날 때 단 한번만 실행된다! 	 
 			//setInterval 은 계속!! 실행해주는 것.
 		},'json' );
 }
 
-var ArticleReply__$listTbody;
+var Reply__$listTbody;
 
 
-function ArticleReplyList__drawReply(articleReply) {
+function ReplyList__drawReply(reply) {
 
 
 	var html = $('.template-box-1 tbody').html(); 
 	//자바스크립트에서 해당 template를 찾아서 html로 사용하겠다..? 는 의미.
 
-	html = replaceAll(html, "{$번호}", articleReply.id);
-	html = replaceAll(html, "{$날짜}", articleReply.regDate);
- 	html = replaceAll(html, "{$작성자}", articleReply.extra.writer);
-	html = replaceAll(html, "{$내용}", articleReply.body);
+	html = replaceAll(html, "{$번호}", reply.id);
+	html = replaceAll(html, "{$날짜}", reply.regDate);
+ 	html = replaceAll(html, "{$작성자}", reply.extra.writer);
+	html = replaceAll(html, "{$내용}", reply.body);
 	
 				
 
 	
-	ArticleReply__$listTbody.prepend(html);
+	Reply__$listTbody.prepend(html);
 }
 // html ? 밑에까지 다 처리가 된 후 마지막에 실행되게 하는 함수 실행법 
 $(function() {
 
-	ArticleReply__$listTbody = $('.article-reply-list-box > table tbody');
+	Reply__$listTbody = $('.article-reply-list-box > table tbody');
 
 
 	// 상세보기 페이지로 이동하면 바로 리스트를 불러오는 함수.
-	ArticleReply__loadList();
+	Reply__loadList();
 
 	// 상세보기 페이지로 이동하면 1초 있다가 계속 리스팅 해주는. 
-	// 그래서 처음 페이지에 접속해도 1초 있다가 리스트를 불러오므로  ArticleReply__loadList();를 먼저 호출
-	//setInterval(ArticleReply__loadList, 1000);
+	// 그래서 처음 페이지에 접속해도 1초 있다가 리스트를 불러오므로  Reply__loadList();를 먼저 호출
+	//setInterval(Reply__loadList, 1000);
 	// Ajax로 전송을 하고 data를 받은 후에 리스팅을 해야하는데, 데이터를 받기도 전에 리스팅을 해버리는 문제가 있음.(setTimeout으로 문제 해결)
 });
 
 
 
-function ArticleReply__enableModifyMode(obj) {
+function Reply__enableModifyMode(obj) {
 	var $clickedBtn = $(obj);
 	var $tr = $clickedBtn.closest('tr');
 
@@ -213,7 +213,7 @@ function ArticleReply__enableModifyMode(obj) {
 	
 }
 
-function ArticleReply__disableModifyMode(obj) {
+function Reply__disableModifyMode(obj) {
 	
 	var $clickedBtn = $(obj);
 	var $tr = $clickedBtn.closest('tr');
@@ -225,7 +225,7 @@ function ArticleReply__disableModifyMode(obj) {
 
 
 
-function ArticleReply__submitModifyReplyForm(form) {
+function Reply__submitModifyReplyForm(form) {
 
 	var $tr = $(form).closest('tr');
 	form.body.value = form.body.value.trim();
@@ -253,7 +253,7 @@ function ArticleReply__submitModifyReplyForm(form) {
 			$tr.attr('data-loading-modify', 'N');
 
 			
-			ArticleReply__disableModifyMode(form);  
+			Reply__disableModifyMode(form);  
 
 			var $replyBodyText = $tr.find('.reply-body-text');
 			var $textarea = $tr.find('form textarea');
@@ -263,7 +263,7 @@ function ArticleReply__submitModifyReplyForm(form) {
 			// 아래는 회원 기능이 없기 때문에 삭제할 수 없어서 위에 만들어버림
 			if ( data.resultCode.substr(0, 2) == 'S-' ) {
 				
-				ArticleReply__disableModifyMode(form); 
+				Reply__disableModifyMode(form); 
 
 				var $replyBodyText = $tr.find('.reply-body-text');
 				var $textarea = $tr.find('form textarea');
@@ -290,7 +290,7 @@ function ArticleReply__submitModifyReplyForm(form) {
 
 
 // (obj) a태그를 조종할 수 있는 리모콘 버튼이다.
-function ArticleReply__delete(obj) {
+function Reply__delete(obj) {
 	var $clickedBtn = $(obj);  // obj 버튼을 -> $(obj); 이런식으로 만들어서 var에 담으면? 관리가 편해진다.
 	// $clickedBtn : 교장 ( 교장은 학생을 관리한다.)
 
@@ -352,18 +352,18 @@ function ArticleReply__delete(obj) {
 					<div class="modify-mode-block">
 						<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
 						<form
-							onsubmit="ArticleReply__submitModifyReplyForm(this); return false;">
+							onsubmit="Reply__submitModifyReplyForm(this); return false;">
 							<textarea name="body" class="height-100px">{$내용}</textarea>
 							<br /> <input class="loading-none" type="submit" value="수정" />
 						</form>
 					</div>
 				</td>
 				<td><span class="loading-delete-inline">삭제중입니다...</span>
-					<a class="loading-none" href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
+					<a class="loading-none" href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { Reply__delete(this); } return false;">삭제</a>
 					<a class="loading-none modify-mode-none" href="#"
-					onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
+					onclick="Reply__enableModifyMode(this); return false;">수정</a>
 					<a class="loading-none modify-mode-inline" href="#"
-					onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
+					onclick="Reply__disableModifyMode(this); return false;">수정취소</a>
 				</td>
 			</tr>
 		</tbody>
@@ -396,12 +396,12 @@ function ArticleReply__delete(obj) {
 			</tr>
 		</thead>
 		<tbody>
-			<%-- <c:forEach items="${articleReplies}" var="articleReply">
+			<%-- <c:forEach items="${articleReplies}" var="reply">
 				<div class="replyList">
 					<tr>
-						<td>${articleReply.id}</td>
-						<td>${articleReply.regDate}</td>
-						<td>${articleReply.body}</td>
+						<td>${reply.id}</td>
+						<td>${reply.regDate}</td>
+						<td>${reply.body}</td>
 						<td><a href="#">삭제</a>
 							<a href="#">수정</a>
 						</td>

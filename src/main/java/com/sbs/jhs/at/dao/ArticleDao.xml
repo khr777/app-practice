@@ -35,21 +35,22 @@
 		M.nickname AS extra__writer
 		FROM article AS AR
 		INNER JOIN member AS M
-		ON AR.memberId = M.id
+		ON
+		AR.memberId = M.id
 		WHERE AR.displayStatus = 1
 		AND AR.id = #{id}
 	</select>
-<!-- 게시물 상세보기 작성자 만들고 있음 -->
-	
-	
-	
-	
-<!-- 	<select id="getForPrintArticleById" resultType="Article"> -->
-<!-- 		SELECT * -->
-<!-- 		FROM -->
-<!-- 		article -->
-<!-- 		WHERE id = #{id} -->
-<!-- 	</select> -->
+	<!-- 게시물 상세보기 작성자 만들고 있음 -->
+
+
+
+
+	<!-- <select id="getForPrintArticleById" resultType="Article"> -->
+	<!-- SELECT * -->
+	<!-- FROM -->
+	<!-- article -->
+	<!-- WHERE id = #{id} -->
+	<!-- </select> -->
 
 	<!-- parameterType : 메소드의 형태가 map임을 의미, 생략 가능 -->
 	<!-- parameterType 이 int다 doWrite(int id) 의 형태라면 -->
@@ -122,11 +123,12 @@
 
 	<insert id="writeReply" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO
-		articleReply
+		reply
 		SET regDate = NOW(),
 		updateDate = NOW(),
 		displayStatus = 1,
-		articleId = #{articleId},
+		relTypeCode = #{relTypeCode},
+		relId = #{relId},
 		body = #{body},
 		memberId =
 		#{memberId}
@@ -135,62 +137,67 @@
 
 	<!-- articleDao.java 에서 해당 메서드의 인자를 articleId로 셋팅해두었기 때문에 #{articleId}로 
 		사용 가능 -->
-	<select id="getForPrintArticleReplies" resultType="ArticleReply">
+	<select id="getForPrintReplies" resultMap="reply">
 		SELECT *
 		FROM
-		articleReply
+		reply
 		WHERE displayStatus = 1
-		AND articleId = #{articleId}
+		AND relId = #{relId}
+		relTypeCode = 'article'
 		ORDER
 		BY id DESC
 	</select>
 
-	<select id="getArticleReply" resultType="ArticleReply">
+	<select id="getReply" resultMap="reply">
 		SELECT *
 		FROM
-		articleReply
+		reply
 		WHERE id = #{id}
 	</select>
 
-	<update id="softDeleteArticleReply">
-		UPDATE articleReply
+	<update id="softDeleteReply">
+		UPDATE reply
 		SET
 		delStatus = 1,
 		delDate = NOW(),
 		displayStatus = 0
 		WHERE id = #{id}
 	</update>
-	<select id="getForPrintArticleReplyById"
-		resultType="ArticleReply">
-		SELECT *
-		FROM articleReply
-		WHERE id = #{id}
-	</select>
-
-	<update id="modifyReply" parameterType="map">
-		UPDATE articleReply
-		SET
-		updateDate = NOW(),
-		body = #{body}
-		WHERE id = #{id}
-	</update>
-
-	<select id="getForPrintArticleRepliesFrom"	resultMap="articleReply">
-		<![CDATA[
+	<select id="getForPrintReplyById"
+		resultMap="reply">
 		SELECT AR.*,
 		M.nickname AS extra__writer
-		FROM articleReply AS AR
+		FROM reply AS
+		AR
 		INNER JOIN member AS M
 		ON AR.memberId = M.id
-		WHERE AR.displayStatus = 1
-		AND	AR.articleId = #{id}
+		WHERE AR.id = #{id}
+		AND
+		AR.displayStatus = 1
+		AND AR.id = #{id}
+	</select>
+
+	
+	<select id="getForPrintRepliesFrom"  resultMap="reply">
+		 <![CDATA[
+		SELECT AR.*,
+		M.nickname AS extra__writer
+		FROM reply AS AR
+		INNER JOIN member AS M
+		ON AR.memberId = M.id
+		WHERE AR.relId = #{relId}
+		AND AR.relTypeCode = #{relTypeCode}
+		AND AR.displayStatus = 1
 		AND AR.id >= #{from}
 		ORDER BY AR.id ASC
 		]]>
 		<!-- 샘은 ORDER BY id ASC 하시고, reverse 사용 안하심 -->
 	</select>
 
-	<resultMap type="ArticleReply" id="articleReply">
+
+
+
+	<resultMap type="Reply" id="reply">
 		<id property="id" column="id" />
 		<id property="regDate" column="regDate" />
 		<id property="updateDate" column="updateDate" />
@@ -198,13 +205,14 @@
 		<id property="delStatus" column="delStatus" />
 		<id property="body" column="body" />
 		<id property="memberId" column="memberId" />
-		<id property="articleId" column="articleId" />
+		<id property="relId" column="relId" />
+		<id property="relTypeCode" column="relTypeCode" />
 		<association property="extra" javaType="map">
 			<id property="writer" column="extra__writer" />
 		</association>
 	</resultMap>
-	
-	
+
+
 	<resultMap type="Article" id="article">
 		<id property="id" column="id" />
 		<id property="regDate" column="regDate" />

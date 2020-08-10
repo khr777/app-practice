@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
-import com.sbs.jhs.at.dto.ArticleReply;
+import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.Member;
 import com.sbs.jhs.at.dto.ResultData;
 import com.sbs.jhs.at.service.ArticleService;
+import com.sbs.jhs.at.service.ReplyService;
 import com.sbs.jhs.at.util.Util;
 
 import lombok.extern.slf4j.Slf4j;
@@ -91,9 +92,9 @@ public class ArticleController {
 
 		model.addAttribute("article", article);
 
-		//List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(article.getId());
+		//List<Reply> replies = articleService.getForPrintReplies(article.getId());
 
-		//model.addAttribute("articleReplies", articleReplies); // 굽는다.
+		//model.addAttribute("replies", replies); // 굽는다.
 		return "article/detail";
 	}
 
@@ -128,8 +129,11 @@ public class ArticleController {
 
 	@RequestMapping("/usr/article/doWriteReply")
 	public String doWriteReply(@RequestParam Map<String, Object> param) {
-
-		int newArticleReplyId = articleService.writeReply(param);
+		
+		
+		
+		
+		int newReplyId = articleService.writeReply(param);
 
 		int articleId = Util.getAsInt((String) param.get("articleId"));
 
@@ -194,132 +198,34 @@ public class ArticleController {
 	public String doDeleteReply(Model model, @RequestParam Map<String, Object> param) {
 
 		// 댓글 삭제 가능한지 물어보는 메서드
-		// Map<String, Object> articleReplyDeleteAvailable =
-		// articleService.getArticleReplyDeleteAvailable(id);
+		// Map<String, Object> replyDeleteAvailable =
+		// articleService.getReplyDeleteAvailable(id);
 
-		// Map<String, Object> rs = articleService.softDeleteArticleReply(id);
+		// Map<String, Object> rs = articleService.softDeleteReply(id);
 
-		Map<String, Object> rs = articleService.softDeleteArticleReply(Util.getAsInt(param.get("id")));
+		Map<String, Object> rs = articleService.softDeleteReply(Util.getAsInt(param.get("id")));
 
 		String redirectUrl = (String) param.get("redirectUrl");
 		System.out.println("redirectUrl : " + redirectUrl);
 		int articleId = Util.getAsInt(param.get("articleId"));
 		redirectUrl = redirectUrl.replace("#id", articleId + "");
 		System.out.println("redirectUrl : " + redirectUrl);
-		// ---------------- 혹시 articleId 형 변환을 해야 할 수도???????????
-
-		/*
-		 * String msg = id + "번 게시물이 삭제되었습니다.";
-		 * 
-		 * StringBuilder sb = new StringBuilder();
-		 * 
-		 * sb.append("alert('" + msg + "');"); sb.append("location.replace('./list');");
-		 * 
-		 * sb.insert(0, "<script>"); sb.append("</script>");
-		 * 
-		 * return sb.toString();
-		 */
 		return "redirect:" + redirectUrl;
 	}
 
 	@RequestMapping("/usr/article/modifyReply")
 	public String showModifyReply(Model model, int id) {
 
-		ArticleReply articleReply = articleService.getForPrintArticleReplyById(id);
+		Reply reply = articleService.getForPrintReplyById(id);
 
-		model.addAttribute("articleReply", articleReply);
+		model.addAttribute("reply", reply);
 
 		return "article/modifyReply";
 	}
 
-	@RequestMapping("/usr/article/doModifyReply")
-	public String doModifyReply(@RequestParam Map<String, Object> param, int id) {
-
-		
-		System.out.println("param : " + param);
-		articleService.modifyReply(param, id);
-
-		String redirectUrl = (String) param.get("redirectUrl");
-
-		return "redirect:" + redirectUrl;
-
-	}
 	
-	@RequestMapping("/usr/article/doWriteReplyAjax")
-	@ResponseBody // Ajax는 이걸 꼭 해주어야 한다.
-	public ResultData doWriteReplyAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
-		Map<String, Object> rsDataBody = new HashMap<>();
-		param.put("memberId", request.getAttribute("loginedMemberId"));
-		
-		int newArticleReplyId =  articleService.writeReply(param);
-		rsDataBody.put("articleReplyId", newArticleReplyId);
 		
 		
-		return new ResultData("S-1", String.format("%d번 댓글이 생성되었습니다.", newArticleReplyId));
-	}
-	
-	
-	// Rs 의미 : Map 을 return 한다는 의미.
-	@RequestMapping("/usr/article/getForPrintArticleRepliesRs") 
-	@ResponseBody
-	public ResultData getForPrintArticleRepliesRs(@RequestParam Map<String, Object> param, HttpServletRequest request) {
-		
-		Member loginedMember = (Member)request.getAttribute("loginedMember");
-		
-		
-		param.put("actor", loginedMember);
-		
-		Map<String, Object> rsDataBody = new HashMap<>();
-		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(param);
-		
-		
-		rsDataBody.put("articleReplies", articleReplies);
-		
-		System.out.println("rsDateBody size : " + articleReplies.size() );
-		return new ResultData("S-1", String.format("%d개의 댓글을 불러왔습니다.", articleReplies.size()),rsDataBody );
-	}
-	@RequestMapping("/usr/article/doDeleteReplyAjax")
-	@ResponseBody
-	public ResultData doDeleteReply(@RequestParam Map<String, Object> param, int id) {
-		
-
-		articleService.softDeleteArticleReply(id);
-
-		  
-		// ★ 시간 지연을 걸 수 있음.
-		// Ajax 너무 빨라서 "삭제중입니다.. 안 보일 때 사용해서 참고할 것.
-		try {
-			Thread.sleep(1000);  // 3초 쉬는거.  3초 잠재우는 것.
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		
-		return new ResultData("S-1", String.format("%d번 댓글을 삭제하였습니다.",id ));
-	}
-	
-	@RequestMapping("/usr/article/doModifyReplyAjax")
-	@ResponseBody
-	public Map<String, Object> doModifyReplyAjax(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
-
-		
-		
-		Map<String, Object> rs = articleService.modifyReply(param, id);
-		
-		//임시용 
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
-		
-		return rs;
-
-	}
-	
 
 
 

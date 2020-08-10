@@ -10,13 +10,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ArticleReply {
+public class Reply {
 	private int id;
 	private String regDate;
 	private String updateDate;
 	private boolean delStatus;
 	private String delDate;
-	private int articleId;
+	private int relId;
+	private String relTypeCode;
 	private int memberId;
 	private boolean displayStatus;
 	private String body;

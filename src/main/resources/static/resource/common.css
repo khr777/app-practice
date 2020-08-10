@@ -33,6 +33,58 @@ label[for] {
 	margin-right: auto;
 }
 
+
+.border-red {
+	border:10px solid red;
+}
+
+
+
+/* 다른 애들을 이기기 위해 억지로 만들어낸것 */
+html > head + body:nth-child(2) .height-100px {
+	min-height:100px !important ;
+
+}
+
+
+/* !important 의미 : 우선 순위를 가장 높이 올려버리는__남용하면 좋은 것은 아니다.*/
+/* 아래 예시	write 페이지의 textarea를 min-height로 하고 .height-100px 을 !important했더니 먹지 않았으나 동일하게 min-을 적용하니 css가 입혀짐   */
+
+/* .height-100px {
+	min-height:100px !important;
+
+} */
+
+
+.bg-white {
+	background-color:white;
+}
+
+.padding-10 {
+	padding:10px;
+}
+
+/* flex 관련 */
+
+.flex {
+	display:flex;
+}
+
+.flex-ai-c {
+	align-items: center;
+}
+
+.flex-jc-c {
+	justify-content: center;
+}
+
+
+
+
+
+
+
+/* 테이블 관련 */
 .table-box>table {
 	width: 100%;
 	border-collapse: collapse;
@@ -45,7 +97,7 @@ label[for] {
 }
 
 
-/* 폼 관련 라이브러리 */
+/* 폼 관련  */
 
 
 .form1 .form-control-box>input, .form1 .form-control-box> textarea {
@@ -70,27 +122,34 @@ label[for] {
 }
 
 
+.form1 .form-row {
+	display:flex;
+}
 
-
-/* 다른 애들을 이기기 위해 억지로 만들어낸것 */
-html > head + body:last-child .height-100px {
-	min-height:100px !important ;
-
+.form1 .form-row > .form-control-label {
+	display:flex;
+	align-items:center;
+	padding:10px;
 }
 
 
-/* !important 의미 : 우선 순위를 가장 높이 올려버리는__남용하면 좋은 것은 아니다.*/
-/* 아래 예시	write 페이지의 textarea를 min-height로 하고 .height-100px 을 !important했더니 먹지 않았으나 동일하게 min-을 적용하니 css가 입혀짐   */
+.form1 .form-row > .form-control-box {
+	display:flex;
+	align-items:center;
+	padding:10px;
+}
 
-/* .height-100px {
-	min-height:100px !important;
 
-} */
+
+
+
+
 
 /* 커스텀 */
 .con {
 	max-width: 1200px;
 }
+
 
 .template-box {
 	display:none;

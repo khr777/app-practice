@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sbs.jhs.at.dto.Article;
-import com.sbs.jhs.at.dto.ArticleReply;
+import com.sbs.jhs.at.dto.Reply;
 
 @Mapper
 public interface ArticleDao {
@@ -35,21 +35,21 @@ public interface ArticleDao {
 
 	void writeReply(@RequestParam Map<String, Object> param);
 
-	List<ArticleReply> getForPrintArticleReplies(@Param("articleId") int articleId); // @Param("id") 의미 : int id를 "id"라는 이름으로 쓸 수 있다.
+	List<Reply> getForPrintReplies(@Param("articleId") int articleId); // @Param("id") 의미 : int id를 "id"라는 이름으로 쓸 수 있다.
 
-	ArticleReply getArticleReply(@Param("id") int id);
+	Reply getReply(@Param("id") int id);
 
-	void softDeleteArticleReply(@Param("id") int id);
+	void softDeleteReply(@Param("id") int id);
 
-	ArticleReply getForPrintArticleReplyById(@Param("id") int id);
+	Reply getForPrintReplyById(@Param("id") int id);
 	
 	
-	//@RequestParam Map<String, Object> param, int id 는 중복?이어서 함께 articleDao로 보낼 수 없는가봄??에러 발생한다. int id 빼니까 오류 안남.
-	void modifyReply(@RequestParam Map<String, Object> param);
+	//코드 최신 전 -> @RequestParam Map<String, Object> param, int id 는 중복?이어서 함께 articleDao로 보낼 수 없는가봄??에러 발생한다. int id 빼니까 오류 안남.
+	void modifyReply(Map<String, Object> param);
 
-	List<ArticleReply> getForPrintArticleRepliesFrom(@Param("id") int id, @Param("from") int from);
+	//List<Reply> getForPrintRepliesFrom(@Param("id") int id, @Param("from") int from);
 
-	List<ArticleReply> getForPrintArticleRepliesFrom(@RequestParam Map<String, Object> param);
+	List<Reply> getForPrintRepliesFrom(@RequestParam Map<String, Object> param);
 
 
 

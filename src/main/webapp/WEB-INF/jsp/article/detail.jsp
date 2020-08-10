@@ -85,9 +85,10 @@
 		}
 
 		// Ajax화 시작
-		$.post(	'./doWriteReplyAjax',   // 기존 form 의 action을 입력해주고 전송할 데이터를 입력해준다.
+		$.post(	'./../reply/doWriteReplyAjax',   // 기존 form 의 action을 입력해주고 전송할 데이터를 입력해준다.
 			{	
-				articleId : ${param.id},
+				relId : ${param.id},
+				relTypeCode : 'article',
 				body: form.body.value
 				// ajax: true  만약 post를 ./doWriteReplyAjax  Ajax를 붙이지 않는 경우 이렇게 ajax true를 날려주는게 좋다. 
 			},
@@ -127,46 +128,7 @@
 <h2 class="con">댓글 리스트</h2>
 
 
-<!-- 		class="loading-none" 의미 : 로딩 중일 때 안보여야 하는 버튼 -->
-<!-- 수정, 삭제 버튼에서 테스트 할 때 버튼 클릭할 때마다 맨 위로 이동하는 것을 onclick="return false;"로 잠시 막을 수 있다. -->
-<div class="template-box template-box-1">
-	<table border="1">
-		<tbody>
-			<tr data-article-reply-id="{$번호}">
-				<td>{$번호}</td>
-				<td>{$날짜}</td>
-				<td>{$작성자}</td>
-				<td>
-					<div class="reply-body-text modify-mode-none">{$내용}</div>
-					<div class="modify-mode-block">
-						<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
-						<form
-							onsubmit="ArticleReply__submitModifyReplyForm(this); return false;">
-							<textarea name="body" class="height-100px">{$내용}</textarea>
-							<br /> <input class="loading-none" type="submit" value="수정" />
-						</form>
-					</div>
-				</td>
-				<td>
-				<span class="loading-delete-inline">삭제중입니다...</span>
-				 <a	class="loading-none" href="#"onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
-					<a class="loading-none modify-mode-none" href="#"
-					onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
-					<a class="loading-none modify-mode-inline" href="#"
-					onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-
-
-
-
-
-
-
-<div class="article-reply-list-box table-box con">
+<div class="reply-list-box table-box con">
 	<table>
 		<colgroup>
 			<col width="100" />
@@ -191,156 +153,198 @@
 </div>
 
 
+<style>
+.reply-modify-form-modal {
+	position:fixed;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	background-color:rgba(0,0,0,0.4);
+	display:none;
+}
+
+.reply-modify-form-modal-actived .reply-modify-form-modal {
+	display:flex;
+}
+
+
+
+</style>
+
+<div class="reply-modify-form-modal flex flex-jc-c flex-ai-c" >
+	<form action="" class="form1  bg-white padding-10" onsubmit="ReplyList__submitModifyForm(this); return false;">
+	<input type="hidden" name="id" />
+		<div class="form-row">
+			<div class="form-control-label">
+				내용 
+			</div>
+			<div class="form-control-box">
+				<textarea name="body" placeholder="내용을 입력해주세요." autofocus ></textarea>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-control-label">
+				수정 
+			</div>
+			<div class="form-control-box">
+				<button type="submit">수정</button>
+				<button type="button" onclick="ReplyList__hideModifyFormModal();">취소</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+
 <script>
 
 /* function replaceAll(str, searchStr, replaceStr) {
 	return str.split(searchStr).join(replaceStr);
 } */
 
-var ArticleReplyList__$box = $('.article-reply-list-box');
-var ArticleReplyList__$tbody = ArticleReplyList__$box.find('tbody');
-var ArticleReplyList__lastLodedId = 0;
+var ReplyList__$box = $('.reply-list-box');
+var ReplyList__$tbody = ReplyList__$box.find('tbody');
+var ReplyList__lastLodedId = 0;
 
-function ArticleReplyList__loadMore() {
-	$.get('getForPrintArticleRepliesRs',{   // get : select 하는 것.
-			id : param.id, //${param.id}, head에 구워?놓았기 때문에 중괄호 없이 사용 가능
-			from : ArticleReplyList__lastLodedId + 1 
-		}, function(data) {
-			if ( data.body.articleReplies && data.body.articleReplies.length > 0 ) {
-				ArticleReplyList__lastLodedId = data.body.articleReplies[data.body.articleReplies.length - 1].id;
-				ArticleReplyList__drawReplies(data.body.articleReplies);
-			}
-			
-			setTimeout(ArticleReplyList__loadMore, 1000);
-		}, 'json');
-	}
+var ReplyList__submitModifyFormDone = false;
 
+function ReplyList__submitModifyForm(form) {
 
-function ArticleReplyList__drawReplies(articleReplies) {
-	for ( var i = 0; i < articleReplies.length; i++ ) {
-		var articleReply = articleReplies[i];
-		ArticleReplyList__drawReply(articleReply);
-	}
-}
-
-
-
-
-function ArticleReplyList__drawReply(articleReply) {
-
-	var html = '';
-	
-	html += '<tr data-id="' + articleReply.id + '">';
-	html += '<td>' + articleReply.id + '</td>';
-	html += '<td>' + articleReply.regDate + '</td>';
-	html += '<td>' + articleReply.extra.writer + '</td>';
-	html += '<td>' + articleReply.body + '</td>';
-	html += '<td><span class="loading-delete-inline">삭제중입니다...</span>';
-	html += '<button class="loading-none" onclick="ArticleReply__delete(this);">삭제</button></td>';
-	html += '</tr>';
-				
-
-	
-	ArticleReplyList__$tbody.prepend(html);
-	
-}	
-
-ArticleReplyList__loadMore();
-
-
-function ArticleReply__enableModifyMode(obj) {
-	var $clickedBtn = $(obj);
-	var $tr = $clickedBtn.closest('tr');
-
-	var $replyBodyText = $tr.find('.reply-body-text');
-	var $textarea = $tr.find('form textarea');
-
-	$textarea.val($replyBodyText.text().trim());
-
-
-	$tr.attr('data-modify-mode', 'Y');
-
-	
-}
-
-function ArticleReply__disableModifyMode(obj) {
-	
-	var $clickedBtn = $(obj);
-	var $tr = $clickedBtn.closest('tr');
-
-	$tr.attr('data-modify-mode', 'N');
 		
-}
+	if ( ReplyList__submitModifyFormDone ) {
+		alert('처리중입니다.');
+		return;
+	}
 
-
-
-
-function ArticleReply__submitModifyReplyForm(form) {
-
-	var $tr = $(form).closest('tr');
+	
 	form.body.value = form.body.value.trim();
 
 	if ( form.body.value.length == 0 ) {
-		alert('댓글내용을 입력 해주세요.');
+		alert('내용을 입력해주세요.');
 		form.body.focus();
 
-		return false;
+		return;
 	}
 
-	var replyId = parseInt($tr.attr('data-article-reply-id'));
+	var id = form.id.value;
 	var body = form.body.value;
-
-	$tr.attr('data-loading', 'Y');
-	$tr.attr('data-loading-modify', 'Y');
-
+	
 	
 
-	$.post('./doModifyReplyAjax', {
-			id: replyId,
-			body: body
-		}, function(data) {
-			$tr.attr('data-loading', 'N');
-			$tr.attr('data-loading-modify', 'N');
+	ReplyList__submitModifyFormDone = true;
 
-			
-			ArticleReply__disableModifyMode(form);  
-
-			var $replyBodyText = $tr.find('.reply-body-text');
-			var $textarea = $tr.find('form textarea');
-
-			$replyBodyText.text($textarea.val());
-
-			// 아래는 회원 기능이 없기 때문에 삭제할 수 없어서 위에 만들어버림
-			if ( data.resultCode.substr(0, 2) == 'S-' ) {
-				
-				ArticleReply__disableModifyMode(form); 
-
-				var $replyBodyText = $tr.find('.reply-body-text');
-				var $textarea = $tr.find('form textarea');
-
-				$replyBodyText.text($textarea.val());
-			}
-	 		
-			else {
-				if ( data.msg ) {
-					alert(data.msg);
-				}
-			}
+	$.post('../reply/doModifyReplyAjax', {
+		id: id,
+		body: body
+	
+	}, function(data){
+		if (data.resultCode && data.resultCode.substr(0, 2) == 'S-') {
+			// 성공시에는 기존에 그려진 내용을 수정해야 한다.!!
+			var $tr = $('.reply-list-box tbody > tr[data-id="' + id
+					+ '"] .reply-body');
+			$tr.empty().append(body);
 		}
-	);
-
-
+		ReplyList__hideModifyFormModal();
+		ReplyList__submitModifyFormDone = false;
+		}, 'json');
 
 	
 }
 
+function ReplyList__showModifyFormModal(el) {
+	$('html').addClass('reply-modify-form-modal-actived');
+	
+	var $tr = $(el).closest('tr');
+	var originBody = $tr.data('data-originBody');
+
+	
+	
+	
+	var id = $tr.attr('data-id');
+
+	var form = $('.reply-modify-form-modal form').get(0);
+
+
+	
+	form.id.value = id;
+	form.body.value = originBody;
+	
+	
+}
+
+
+function ReplyList__hideModifyFormModal() {
+	$('html').removeClass('reply-modify-form-modal-actived');
+	
+}
+
+
+function ReplyList__loadMoreCallback(data) {
+	if (data.body.replies && data.body.replies.length > 0) {
+		ReplyList__lastLodedId = data.body.replies[data.body.replies.length - 1].id;
+		ReplyList__drawReplies(data.body.replies);
+	}
+	setTimeout(ReplyList__loadMore, 2000);
+}
+
+function ReplyList__loadMore() {
+	$.get('../reply/getForPrintRepliesRs',{   // get : select 하는 것.
+			articleId : param.id, //${param.id}, head에 구워?놓았기 때문에 중괄호 없이 사용 가능
+			from : ReplyList__lastLodedId + 1 
+		}, ReplyList__loadMoreCallback, 'json');
+	}
+
+
+function ReplyList__drawReplies(replies) {
+	for ( var i = 0; i < replies.length; i++ ) {
+		var reply = replies[i];
+		ReplyList__drawReply(reply);
+	}
+}
+
+
+
+
+function ReplyList__drawReply(reply) {
+
+	var html = '';
+	
+	html += '<tr data-id="' + reply.id + '">';
+	html += '<td>' + reply.id + '</td>';
+	html += '<td>' + reply.regDate + '</td>';
+	html += '<td>' + reply.extra.writer + '</td>';
+	html += '<td class="reply-body">' + reply.body + '</td>';
+	html += '<td>';
+	if ( reply.extra.actorCanDelete) {
+		html += '<span class="loading-delete-inline">삭제중입니다...</span>';
+		html += '<button type="button" class="loading-none" onclick="if ( confirm(\'정말 삭제하시겠습니까?\')) Reply__delete(this);">삭제</button>';	
+	}
+	if ( reply.extra.actorCanModify) {
+		html += '<button  type="button" class="loading-none" onclick="ReplyList__showModifyFormModal(this);">수정</button>';	
+	}
+	html += '</td>';
+	html += '</tr>';
+				
+
+	var $tr = $(html);
+	// data는 엘리먼트에 변수를 추가할 수 있다.
+	// data는 엘리먼트에 데이터를 추가할 수 있다.
+	// data는 attr보다 더 복잡한 데이터도 저장 가능.
+	$tr.data('data-originBody', reply.body);
+	
+	ReplyList__$tbody.prepend($tr);
+	
+}	
+
+ReplyList__loadMore();
 
 
 
 
 
 // (obj) a태그를 조종할 수 있는 리모콘 버튼이다.
-function ArticleReply__delete(obj) {
+function Reply__delete(obj) {
 	var $clickedBtn = $(obj);  // obj 버튼을 -> $(obj); 이런식으로 만들어서 var에 담으면? 관리가 편해진다.
 	// $clickedBtn : 교장 ( 교장은 학생을 관리한다.)
 
@@ -360,7 +364,7 @@ function ArticleReply__delete(obj) {
 	$tr.attr('data-loading-delete', 'Y');
 	
 	$.post(
-		'./doDeleteReplyAjax',  //편지 받는 사람
+		'./../reply/doDeleteReplyAjax',  //편지 받는 사람
 		{
 			id: replyId
 		},
@@ -418,39 +422,39 @@ textarea {
 	width: 100%;
 }
 
-.article-reply-list-box tr .loading-delete-inline {
+.reply-list-box tr .loading-delete-inline {
 	display: none;
 	font-weight: bold;
 	color: red;
 }
 
-.article-reply-list-box tr[data-loading="Y"] .loading-none {
+.reply-list-box tr[data-loading="Y"] .loading-none {
 	display: none;
 }
 
 /* loading이면서 delete-loading 일 때 */
-.article-reply-list-box tr[data-loading="Y"][data-loading-delete="Y"] .loading-delete-inline
+.reply-list-box tr[data-loading="Y"][data-loading-delete="Y"] .loading-delete-inline
 	{
 	display: inline;
 }
 
-.article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-none {
+.reply-list-box tr[data-modify-mode="Y"] .modify-mode-none {
 	display: none;
 }
 
-.article-reply-list-box tr .modify-mode-inline {
+.reply-list-box tr .modify-mode-inline {
 	display: none;
 }
 
-.article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-inline {
+.reply-list-box tr[data-modify-mode="Y"] .modify-mode-inline {
 	display: inline;
 }
 
-.article-reply-list-box tr .modify-mode-block {
+.reply-list-box tr .modify-mode-block {
 	display: none;
 }
 
-.article-reply-list-box tr[data-modify-mode="Y"] .modify-mode-block {
+.reply-list-box tr[data-modify-mode="Y"] .modify-mode-block {
 	display: block;
 }
 </style>

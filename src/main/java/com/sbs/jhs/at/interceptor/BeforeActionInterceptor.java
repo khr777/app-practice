@@ -85,7 +85,7 @@ public class BeforeActionInterceptor implements HandlerInterceptor {
 		HttpSession session = request.getSession();
 		
 		// 임시 작업  ( 로그인 작업이 현재 귀찮으니 1번 회원을 로그인 시켜버리는 것)
-		session.setAttribute("loginedMemberId", 1);
+		session.setAttribute("loginedMemberId", 2);
 		
 		
 		// 로그인 여부에 관련된 정보를 request에 담는다.

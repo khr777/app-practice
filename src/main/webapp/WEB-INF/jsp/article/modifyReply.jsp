@@ -19,7 +19,7 @@
 
 <form class="con common-form" action="doModifyReply" method="POST"
 	onsubmit="submitModifyForm(this); return false;">
-	<input type="hidden" name="id" value="${articleReply.id}">
+	<input type="hidden" name="id" value="${reply.id}">
 	<input type="hidden" name="redirectUrl" value="${param.redirectUrl}"/>
 	<div class="table-box">
 		<table>
@@ -29,15 +29,15 @@
 			<tbody>
 				<tr>
 					<th>번호</th>
-					<td>${articleReply.id}</td>
+					<td>${reply.id}</td>
 				</tr>
 				<tr>
 					<th>날짜</th>
-					<td>${articleReply.regDate}</td>
+					<td>${reply.regDate}</td>
 				</tr>
 				<tr>
 					<th>내용</th>
-					<td><textarea maxlength="300" class="height-100px" name="body" placeholder="내용">${articleReply.body}</textarea></td>
+					<td><textarea maxlength="300" class="height-100px" name="body" placeholder="내용">${reply.body}</textarea></td>
 				</tr>
 				<tr>
 					<th>수정</th>

@@ -1,6 +1,8 @@
 package com.sbs.jhs.at.util;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Util {
 
@@ -16,5 +18,24 @@ public class Util {
 		}
 
 		return -1;
+	}
+
+	public static Map<String, Object> getNewMapOf(Map<String, Object> oldMap, String...keys ) {
+		
+		Map<String, Object> newMap = new HashMap<>();
+		
+		
+		for ( String key : keys ) {
+			newMap.put(key, oldMap.get(key));
+		}
+		
+		return newMap;
+	}
+
+	public static void changeMapKey(Map<String, Object> param, String oldKey, String newKey) {
+		Object value = param.get(oldKey);
+		param.remove(oldKey);
+		param.put(newKey, value);
+		
 	}
 }

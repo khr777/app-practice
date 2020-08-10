@@ -39,6 +39,17 @@ title = '제목3',
 displayStatus = 1,
 memberId = 1;
 
+INSERT INTO article
+SET regDate = NOW(),
+updateDate = NOW(),
+title = '제목4',
+`body` = '내용4',
+displayStatus = 1,
+memberId = 1;
+
+
+
+
 SELECT *
 FROM article;
 
@@ -94,6 +105,41 @@ SELECT *
 FROM `articleReply`;
 
 DESC article;
-DESC articleReply;
+
 
 # alter table article add column memberId INT(10) UNSIGNED NOT NULL after hit;
+
+
+SELECT *
+FROM articleReply;
+
+
+SELECT *
+FROM `member`;
+
+
+# member 테이블에 테스트 데이터 삽입
+INSERT INTO `member`
+SET regDate = NOW(),
+updateDate = NOW(),
+loginId = 'hong',
+loginPw = SHA2('hong', 256),
+`name` = '홍길동',
+`nickname` = '홍길동',
+`email` = ' ',
+`phoneNo` = ' ' ;
+
+# 테이블 명 변경 ( 도구-히스토리-맽 밑에 )  reply 범용 만들기(기존 articleReply를)
+# 게시물 댓글을 범용 댓글 테이블로 변경 __ 이렇게하면 사람한테도 댓글을 달 수 있다. 
+RENAME TABLE `articleReply` TO `reply`; 
+
+
+# 범용성을 위해 relTypeCode로 댓글을 어디에 다는지 구분, relId로 article뿐만 아니라 다른 곳들에도 댓글을 달 수 있도록 범용화.
+ALTER TABLE `reply` ADD COLUMN `relTypeCode` CHAR(50) NOT NULL AFTER `delDate`, 
+CHANGE `articleId` `relId` INT(10) UNSIGNED NOT NULL; 
+
+
+ALTER TABLE `reply` ADD INDEX (`relId` , `relTypeCode`);
+
+SELECT *
+FROM reply;
