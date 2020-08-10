@@ -10,6 +10,18 @@
 
 
 
+<script>
+	var ArticleReply__loadListDelay = 3000;
+
+
+	//임시
+	//ArticleReply__loadListDelay = 5000;
+	
+</script>
+
+
+
+
 <div class="table-box con">
 	<table>
 		<colgroup>
@@ -92,7 +104,7 @@
 				// ajax: true  만약 post를 ./doWriteReplyAjax  Ajax를 붙이지 않는 경우 이렇게 ajax true를 날려주는게 좋다. 
 			},
 			function(data) {
-				form.body.focus();
+			
 			},
 			'json' // 필수 ( data 객체를 자바스크립트로 다루겠다는 의미)
 		);
@@ -117,7 +129,9 @@
 				</tr>
 				<tr>
 					<th>작성</th>
-					<td><input type="submit" value="작성" /></td>
+					<td>
+						<input type="submit" value="작성" />
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -126,126 +140,62 @@
 
 <h2 class="con">댓글 리스트</h2>
 
-
-<!-- 		class="loading-none" 의미 : 로딩 중일 때 안보여야 하는 버튼 -->
-<!-- 수정, 삭제 버튼에서 테스트 할 때 버튼 클릭할 때마다 맨 위로 이동하는 것을 onclick="return false;"로 잠시 막을 수 있다. -->
-<div class="template-box template-box-1">
-	<table border="1">
-		<tbody>
-			<tr data-article-reply-id="{$번호}">
-				<td>{$번호}</td>
-				<td>{$날짜}</td>
-				<td>{$작성자}</td>
-				<td>
-					<div class="reply-body-text modify-mode-none">{$내용}</div>
-					<div class="modify-mode-block">
-						<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
-						<form
-							onsubmit="ArticleReply__submitModifyReplyForm(this); return false;">
-							<textarea name="body" class="height-100px">{$내용}</textarea>
-							<br /> <input class="loading-none" type="submit" value="수정" />
-						</form>
-					</div>
-				</td>
-				<td>
-				<span class="loading-delete-inline">삭제중입니다...</span>
-				 <a	class="loading-none" href="#"onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
-					<a class="loading-none modify-mode-none" href="#"
-					onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
-					<a class="loading-none modify-mode-inline" href="#"
-					onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-
-
-
-
-
-
-
-<div class="article-reply-list-box table-box con">
-	<table>
-		<colgroup>
-			<col width="100" />
-			<col width="200" />
-			<col width="200" />
-			<col width="600" />
-			<col width="150" />
-		</colgroup>
-		<thead>
-			<tr>
-				<th>번호</th>
-				<th>날짜</th>
-				<th>작성자</th>
-				<th>내용</th>
-				<th>비고</th>
-
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-</div>
-
-
 <script>
+var ArticleReply__lastLoadedArticleReplyId = 0;
 
-/* function replaceAll(str, searchStr, replaceStr) {
-	return str.split(searchStr).join(replaceStr);
-} */
-
-var ArticleReplyList__$box = $('.article-reply-list-box');
-var ArticleReplyList__$tbody = ArticleReplyList__$box.find('tbody');
-var ArticleReplyList__lastLodedId = 0;
-
-function ArticleReplyList__loadMore() {
-	$.get('getForPrintArticleRepliesRs',{   // get : select 하는 것.
+function ArticleReply__loadList() {
+	$.get('./getForPrintArticleRepliesRs',{   // get : select 하는 것.
 			id : param.id, //${param.id}, head에 구워?놓았기 때문에 중괄호 없이 사용 가능
-			from : ArticleReplyList__lastLodedId + 1 
+			from : ArticleReply__lastLoadedArticleReplyId + 1 
 		}, function(data) {
-			if ( data.body.articleReplies && data.body.articleReplies.length > 0 ) {
-				ArticleReplyList__lastLodedId = data.body.articleReplies[data.body.articleReplies.length - 1].id;
-				ArticleReplyList__drawReplies(data.body.articleReplies);
+			data.articleReplies = data.body.articleReplies.reverse();
+			for ( var i = 0; i < data.articleReplies.length; i++ ) {
+				var articleReply = data.articleReplies[i];
+				ArticleReplyList__drawReply(articleReply);
+
+				ArticleReply__lastLoadedArticleReplyId = articleReply.id;
 			}
-			
-			setTimeout(ArticleReplyList__loadMore, 1000);
-		}, 'json');
-	}
-
-
-function ArticleReplyList__drawReplies(articleReplies) {
-	for ( var i = 0; i < articleReplies.length; i++ ) {
-		var articleReply = articleReplies[i];
-		ArticleReplyList__drawReply(articleReply);
-	}
+			setTimeout(ArticleReply__loadList, ArticleReply__loadListDelay);
+			//setTimeout(ArticleReply__loadList, 1000);  너무 정신 사나워서 delay 로 변경함
+			//setTimeout 은 함수가 끝날 때 단 한번만 실행된다! 	 
+			//setInterval 은 계속!! 실행해주는 것.
+		},'json' );
 }
 
-
+var ArticleReply__$listTbody;
 
 
 function ArticleReplyList__drawReply(articleReply) {
 
-	var html = '';
+
+	var html = $('.template-box-1 tbody').html(); 
+	//자바스크립트에서 해당 template를 찾아서 html로 사용하겠다..? 는 의미.
+
+	html = replaceAll(html, "{$번호}", articleReply.id);
+	html = replaceAll(html, "{$날짜}", articleReply.regDate);
+ 	html = replaceAll(html, "{$작성자}", articleReply.extra.writer);
+	html = replaceAll(html, "{$내용}", articleReply.body);
 	
-	html += '<tr data-id="' + articleReply.id + '">';
-	html += '<td>' + articleReply.id + '</td>';
-	html += '<td>' + articleReply.regDate + '</td>';
-	html += '<td>' + articleReply.extra.writer + '</td>';
-	html += '<td>' + articleReply.body + '</td>';
-	html += '<td><span class="loading-delete-inline">삭제중입니다...</span>';
-	html += '<button class="loading-none" onclick="ArticleReply__delete(this);">삭제</button></td>';
-	html += '</tr>';
 				
 
 	
-	ArticleReplyList__$tbody.prepend(html);
-	
-}	
+	ArticleReply__$listTbody.prepend(html);
+}
+// html ? 밑에까지 다 처리가 된 후 마지막에 실행되게 하는 함수 실행법 
+$(function() {
 
-ArticleReplyList__loadMore();
+	ArticleReply__$listTbody = $('.article-reply-list-box > table tbody');
+
+
+	// 상세보기 페이지로 이동하면 바로 리스트를 불러오는 함수.
+	ArticleReply__loadList();
+
+	// 상세보기 페이지로 이동하면 1초 있다가 계속 리스팅 해주는. 
+	// 그래서 처음 페이지에 접속해도 1초 있다가 리스트를 불러오므로  ArticleReply__loadList();를 먼저 호출
+	//setInterval(ArticleReply__loadList, 1000);
+	// Ajax로 전송을 하고 data를 받은 후에 리스팅을 해야하는데, 데이터를 받기도 전에 리스팅을 해버리는 문제가 있음.(setTimeout으로 문제 해결)
+});
+
 
 
 function ArticleReply__enableModifyMode(obj) {
@@ -354,7 +304,7 @@ function ArticleReply__delete(obj) {
 	
 	//$tr.remove();
 
-	var replyId = parseInt($tr.attr('data-id'));
+	var replyId = parseInt($tr.attr('data-article-reply-id'));
 
 	$tr.attr('data-loading', 'Y');
 	$tr.attr('data-loading-delete', 'Y');
@@ -387,6 +337,81 @@ function ArticleReply__delete(obj) {
 
 
 </script>
+
+<!-- 		class="loading-none" 의미 : 로딩 중일 때 안보여야 하는 버튼 -->
+<!-- 수정, 삭제 버튼에서 테스트 할 때 버튼 클릭할 때마다 맨 위로 이동하는 것을 onclick="return false;"로 잠시 막을 수 있다. -->
+<div class="template-box template-box-1">
+	<table border="1">
+		<tbody>
+			<tr data-article-reply-id="{$번호}">
+				<td>{$번호}</td>
+				<td>{$날짜}</td>
+				<td>{$작성자}</td>
+				<td>
+					<div class="reply-body-text modify-mode-none">{$내용}</div>
+					<div class="modify-mode-block">
+						<!-- 						Ajax로 할거기 때문에 페이지 이동을 막아준다. 함수명만 submit, 전송은 ajax -->
+						<form
+							onsubmit="ArticleReply__submitModifyReplyForm(this); return false;">
+							<textarea name="body" class="height-100px">{$내용}</textarea>
+							<br /> <input class="loading-none" type="submit" value="수정" />
+						</form>
+					</div>
+				</td>
+				<td><span class="loading-delete-inline">삭제중입니다...</span>
+					<a class="loading-none" href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
+					<a class="loading-none modify-mode-none" href="#"
+					onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
+					<a class="loading-none modify-mode-inline" href="#"
+					onclick="ArticleReply__disableModifyMode(this); return false;">수정취소</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+
+
+
+
+
+<div class="article-reply-list-box table-box con">
+	<table>
+		<colgroup>
+			<col width="100" />
+			<col width="200" />
+			<col width="200" />
+			<col width="600" />
+			<col width="150" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>번호</th>
+				<th>날짜</th>
+				<th>작성자</th>
+				<th>내용</th>
+				<th>비고</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			<%-- <c:forEach items="${articleReplies}" var="articleReply">
+				<div class="replyList">
+					<tr>
+						<td>${articleReply.id}</td>
+						<td>${articleReply.regDate}</td>
+						<td>${articleReply.body}</td>
+						<td><a href="#">삭제</a>
+							<a href="#">수정</a>
+						</td>
+					</tr>
+				</div>
+			</c:forEach> --%>
+		</tbody>
+	</table>
+</div>
+
 
 
 

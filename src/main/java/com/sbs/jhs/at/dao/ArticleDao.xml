@@ -176,7 +176,7 @@
 	</update>
 
 	<select id="getForPrintArticleRepliesFrom"	resultMap="articleReply">
-<!-- 		<![CDATA[ -->
+		<![CDATA[
 		SELECT AR.*,
 		M.nickname AS extra__writer
 		FROM articleReply AS AR
@@ -185,8 +185,8 @@
 		WHERE AR.displayStatus = 1
 		AND	AR.articleId = #{id}
 		AND AR.id >= #{from}
-		ORDER BY AR.id DESC
-<!-- 		]]> -->
+		ORDER BY AR.id ASC
+		]]>
 		<!-- 샘은 ORDER BY id ASC 하시고, reverse 사용 안하심 -->
 	</select>
 

@@ -78,8 +78,6 @@ public class ArticleController {
 	public String showDetail(Model model, @RequestParam Map<String, Object> param) {
 		
 		
-		
-		
 		int id = Util.getAsInt(param.get("id"));
 		articleService.hitUp(id);
 
@@ -252,7 +250,7 @@ public class ArticleController {
 	public ResultData doWriteReplyAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
 		Map<String, Object> rsDataBody = new HashMap<>();
 		param.put("memberId", request.getAttribute("loginedMemberId"));
-		System.out.println("param : " + param);
+		
 		int newArticleReplyId =  articleService.writeReply(param);
 		rsDataBody.put("articleReplyId", newArticleReplyId);
 		
@@ -260,26 +258,6 @@ public class ArticleController {
 		return new ResultData("S-1", String.format("%d번 댓글이 생성되었습니다.", newArticleReplyId));
 	}
 	
-	
-	
-	
-	
-	/*
-	 * // Rs 의미 : Map 을 return 한다는 의미.
-	 * 
-	 * @RequestMapping("/usr/article/getForPrintArticleRepliesRs")
-	 * 
-	 * @ResponseBody public Map<String, Object> getForPrintArticleRepliesRs(int id,
-	 * int from) { List<ArticleReply> articleReplies =
-	 * articleService.getForPrintArticleReplies(id, from);
-	 * System.out.println(articleReplies); Map<String, Object> rs = new HashMap<>();
-	 * rs.put("resultCode", "S-1"); rs.put("msg", String.format("총 %d개의 댓글이 있습니다.",
-	 * articleReplies.size())); rs.put("articleReplies", articleReplies);
-	 * 
-	 * 
-	 * return rs; }
-	 * 
-	 */
 	
 	// Rs 의미 : Map 을 return 한다는 의미.
 	@RequestMapping("/usr/article/getForPrintArticleRepliesRs") 
@@ -295,13 +273,9 @@ public class ArticleController {
 		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(param);
 		
 		
-		
-		
-		
-		
 		rsDataBody.put("articleReplies", articleReplies);
 		
-		
+		System.out.println("rsDateBody size : " + articleReplies.size() );
 		return new ResultData("S-1", String.format("%d개의 댓글을 불러왔습니다.", articleReplies.size()),rsDataBody );
 	}
 	@RequestMapping("/usr/article/doDeleteReplyAjax")
@@ -319,7 +293,6 @@ public class ArticleController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
 		
 		
 		return new ResultData("S-1", String.format("%d번 댓글을 삭제하였습니다.",id ));
