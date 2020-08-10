@@ -4,48 +4,55 @@ CREATE DATABASE `at`;
 USE `at`;
 # article 테이블 세팅
 CREATE TABLE article (
-    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME, # 날짜에는 입력되는게 없으면 0000-00-00 00:00:00 을 하기 위함으로 NOT NULL을 뺏음
-    updateDate DATETIME,
-    delDate DATETIME,
-	delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
-	displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
-    title CHAR(200) NOT NULL,
-    `body` LONGTEXT NOT NULL,
-     hit INT(10) UNSIGNED DEFAULT 0 NOT NULL
+id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+regDate DATETIME, # 날짜에는 입력되는게 없으면 0000-00-00 00:00:00 을 하기 위함으로 NOT NULL을 뺏음
+updateDate DATETIME,
+delDate DATETIME,
+delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+title CHAR(200) NOT NULL,
+`body` LONGTEXT NOT NULL,
+ hit INT(10) UNSIGNED DEFAULT 0 NOT NULL,
+ memberId INT(10) UNSIGNED NOT NULL
 );
 # article 테이블에 테스트 데이터 삽입
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
 title = '제목1',
-`body` = '내용1';
+`body` = '내용1',
+memberId = 1;
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
 title = '제목2',
 `body` = '내용2',
-displayStatus = 1;
+displayStatus = 1,
+memberId = 1;
+
+
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
 title = '제목3',
 `body` = '내용3',
-displayStatus = 1;
+displayStatus = 1,
+memberId = 1;
 
 SELECT *
 FROM article;
 
 # 댓글..... 
 CREATE TABLE articleReply (
-    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME, # 날짜에는 입력되는게 없으면 0000-00-00 00:00:00 을 하기 위함으로 NOT NULL을 뺏음
-    updateDate DATETIME,
-    delDate DATETIME,
-    articleId INT(10) UNSIGNED NOT NULL,
-	delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
-	displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
-    `body` LONGTEXT NOT NULL
+id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+regDate DATETIME, # 날짜에는 입력되는게 없으면 0000-00-00 00:00:00 을 하기 위함으로 NOT NULL을 뺏음
+updateDate DATETIME,
+delDate DATETIME,
+articleId INT(10) UNSIGNED NOT NULL,
+delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+memberId INT(10) UNSIGNED NOT NULL,
+displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+`body` LONGTEXT NOT NULL
 );
 
 INSERT INTO article
@@ -53,15 +60,8 @@ SET regDate = NOW(),
 updateDate = NOW(),
 displayStatus = 1,
 title = 'db 놓고왔네ㅠㅠㅠㅠㅠㅠ',
-`body` = '으아아아아ㅠㅠㅠㅠㅠ';
-
-SELECT *
-FROM articleReply;
-
-
-SELECT *
-FROM articleReply
-WHERE id = 1
+`body` = '으아아아아ㅠㅠㅠㅠㅠ',
+memberId = 1;
 
 # member 테이블 세팅
 CREATE TABLE `member` (
@@ -89,3 +89,11 @@ loginPw = SHA2('admin', 256),
 `nickname` = '관리자',
 `email` = ' ',
 `phoneNo` = ' ' ;
+
+SELECT *
+FROM `articleReply`;
+
+DESC article;
+DESC articleReply;
+
+# alter table article add column memberId INT(10) UNSIGNED NOT NULL after hit;

@@ -28,7 +28,8 @@
 <!-- <textarea></textarea> 는 필히 붙여서 써야 placeholder가 나타난다 -->
 <form method="POST" class="form1 table-box con" action="doWrite"
 	onsubmit="ArticleWriteForm__submit(this); return false;">
-	<input type="hidden" name="redirectUrl" value="/article/detail?id=#id">
+	<input type="hidden" name="redirectUrl" value="/usr/article/detail?id=#id">
+	<input type="hidden" name="loginedMemberId" value="${loginedMemberId}"/>
 	<table>
 		<tbody>
 			<tr>

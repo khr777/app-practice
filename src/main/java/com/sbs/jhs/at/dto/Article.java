@@ -20,5 +20,6 @@ public class Article {
 	private String title;
 	private String body;
 	private int hit;
+	private int memberId;
 	private Map<String, Object> extra;
 }

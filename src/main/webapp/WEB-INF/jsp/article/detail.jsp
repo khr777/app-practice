@@ -11,7 +11,7 @@
 
 
 <script>
-	var ArticleReply__loadListDelay = 1000;
+	var ArticleReply__loadListDelay = 3000;
 
 
 	//임시

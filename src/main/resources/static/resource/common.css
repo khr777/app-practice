@@ -64,9 +64,17 @@ label[for] {
 	
 }
 
+.form1 .form-control-box .height-100px {
+	min-height:100px;
+	
+}
+
+
+
+
 /* 다른 애들을 이기기 위해 억지로 만들어낸것 */
 html > head + body:last-child .height-100px {
-	min-height:100px ;
+	min-height:100px !important ;
 
 }
 

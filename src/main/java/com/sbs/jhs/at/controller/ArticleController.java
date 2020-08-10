@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
 import com.sbs.jhs.at.dto.ArticleReply;
+import com.sbs.jhs.at.dto.Member;
 import com.sbs.jhs.at.dto.ResultData;
 import com.sbs.jhs.at.service.ArticleService;
 import com.sbs.jhs.at.util.Util;
@@ -76,7 +76,9 @@ public class ArticleController {
 	// 모든 parameter가 'param'에 다 들어가 있다. 꺼내 쓰기만 하면 된다.
 	@RequestMapping("/usr/article/detail")
 	public String showDetail(Model model, @RequestParam Map<String, Object> param) {
-
+		
+		
+		
 		
 		int id = Util.getAsInt(param.get("id"));
 		articleService.hitUp(id);
@@ -105,6 +107,9 @@ public class ArticleController {
 	@RequestMapping("/usr/article/doWrite")
 	public String doWrite(@RequestParam Map<String, Object> param, HttpServletRequest request) {
 		param.put("memberId", request.getAttribute("loginedMemberId"));
+		
+		//System.out.println("memberId : " + Util.getAsInt(request.getAttribute("loginedMemberId")));
+		
 		int newArticleId = articleService.write(param);
 
 		String redirectUrl = (String) param.get("redirectUrl");
@@ -247,6 +252,7 @@ public class ArticleController {
 	public ResultData doWriteReplyAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
 		Map<String, Object> rsDataBody = new HashMap<>();
 		param.put("memberId", request.getAttribute("loginedMemberId"));
+		System.out.println("param : " + param);
 		int newArticleReplyId =  articleService.writeReply(param);
 		rsDataBody.put("articleReplyId", newArticleReplyId);
 		
