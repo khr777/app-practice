@@ -285,8 +285,20 @@ public class ArticleController {
 	@RequestMapping("/usr/article/getForPrintArticleRepliesRs") 
 	@ResponseBody
 	public ResultData getForPrintArticleRepliesRs(@RequestParam Map<String, Object> param, HttpServletRequest request) {
-		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(param);
+		
+		Member loginedMember = (Member)request.getAttribute("loginedMember");
+		
+		
+		param.put("actor", loginedMember);
+		
 		Map<String, Object> rsDataBody = new HashMap<>();
+		List<ArticleReply> articleReplies = articleService.getForPrintArticleReplies(param);
+		
+		
+		
+		
+		
+		
 		rsDataBody.put("articleReplies", articleReplies);
 		
 		

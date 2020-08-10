@@ -177,25 +177,8 @@ function ArticleReplyList__drawReply(articleReply) {
 	html = replaceAll(html, "{$날짜}", articleReply.regDate);
  	html = replaceAll(html, "{$작성자}", articleReply.extra.writer);
 	html = replaceAll(html, "{$내용}", articleReply.body);
-				
-			
-			
-			
 	
-	/* 
-	var html = '';
-	html += '<tr data-article-reply-id="' + articleReply.id + '"">';
-	html += '<td>' + articleReply.id + '</td>';
-	html += '<td>' + articleReply.regDate + '</td>';
-	html += '<td>' + articleReply.body+ '</td>';
-	html +=  '<td>';
-	html += '<a href="#">삭제</a>';
-	html += '<a href="#">수정</a>';
-	html += '</td>';
-	html += '</tr>';
-	*/  
-
-
+				
 
 	
 	ArticleReply__$listTbody.prepend(html);
@@ -377,9 +360,8 @@ function ArticleReply__delete(obj) {
 						</form>
 					</div>
 				</td>
-				<td><span class="loading-delete-inline">삭제중입니다...</span> <a
-					class="loading-none" href="#"
-					onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
+				<td><span class="loading-delete-inline">삭제중입니다...</span>
+					<a class="loading-none" href="#" onclick="if ( confirm('정말 삭제하시겠습니까?')) { ArticleReply__delete(this); } return false;">삭제</a>
 					<a class="loading-none modify-mode-none" href="#"
 					onclick="ArticleReply__enableModifyMode(this); return false;">수정</a>
 					<a class="loading-none modify-mode-inline" href="#"
