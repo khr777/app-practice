@@ -23,7 +23,7 @@
 
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-		<!-- 구글에서 만든 자바로 클린한 코드를 작성 하기 위한 구조들을 만들어 놓은 라이브러리 이다. 대표적인 클래스는 AbstractService등이 
+		<!-- 자바의 Jquery같은 녀석. 구글에서 만든 자바로 클린한 코드를 작성 하기 위한 구조들을 만들어 놓은 라이브러리 이다. 대표적인 클래스는 AbstractService등이 
 			있다. -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

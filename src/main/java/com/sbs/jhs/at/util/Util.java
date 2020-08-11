@@ -60,6 +60,7 @@ public class Util {
 			return "img";
 		case "mp4":
 		case "avi":
+		case "mov":
 			return "video";
 		case "mp3":
 			return "audio";
@@ -80,6 +81,8 @@ public class Util {
 		case "png":
 			return ext;
 		case "mp4":
+			return ext;
+		case "mov":
 			return ext;
 		case "avi":
 			return ext;

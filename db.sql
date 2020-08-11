@@ -19,14 +19,14 @@ title CHAR(200) NOT NULL,
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
-title = '제목1',
-`body` = '내용1',
+title = '비디오디션 구현중',
+`body` = '이것은 내용',
 memberId = 1;
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
-title = '제목2',
-`body` = '내용2',
+title = '동영상을 올릴 수 있을까',
+`body` = '그럼그럼 당연하지',
 displayStatus = 1,
 memberId = 1;
 
@@ -34,16 +34,16 @@ memberId = 1;
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
-title = '제목3',
-`body` = '내용3',
+title = '오늘도 화이팅!!!',
+`body` = '댓글을 달아보렴',
 displayStatus = 1,
 memberId = 1;
 
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
-title = '제목4',
-`body` = '내용4',
+title = '으아아아아아아아아',
+`body` = '흐어어어어어어어',
 displayStatus = 1,
 memberId = 1;
 
@@ -70,8 +70,8 @@ INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
 displayStatus = 1,
-title = 'db 놓고왔네ㅠㅠㅠㅠㅠㅠ',
-`body` = '으아아아아ㅠㅠㅠㅠㅠ',
+title = '왜 비콘 처리를 안하니 ',
+`body` = '미치겠단 정말',
 memberId = 1;
 
 # member 테이블 세팅
@@ -143,3 +143,29 @@ ALTER TABLE `reply` ADD INDEX (`relId` , `relTypeCode`);
 
 SELECT *
 FROM reply;
+
+
+/* 파일 테이블 생성 */
+CREATE TABLE `file` (
+    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    regDate DATETIME,
+    updateDate DATETIME,
+    delDate DATETIME,
+delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+relTypeCode CHAR(50) NOT NULL,
+relId INT(10) UNSIGNED NOT NULL,
+    originFileName VARCHAR(100) NOT NULL,
+    fileExt CHAR(10) NOT NULL,
+    typeCode CHAR(20) NOT NULL,
+    type2Code CHAR(20) NOT NULL,
+    fileSize INT(10) UNSIGNED NOT NULL,
+    fileExtTypeCode CHAR(10) NOT NULL,
+    fileExtType2Code CHAR(10) NOT NULL,
+    fileNo TINYINT(2) UNSIGNED NOT NULL,
+    `body` LONGBLOB
+); 
+
+
+SELECT * 
+FROM `file`;
+
