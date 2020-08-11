@@ -5,7 +5,15 @@
 <%@ include file="../part/head.jspf"%>
 
 <script>
+	var ArticleWriteForm__submitDone = false;
+	
 	function ArticleWriteForm__submit(form) {
+
+		if ( ArticleWriteForm__submitDone ) {
+			alert('처리중입니다.');
+			return;
+		}
+		
 		form.title.value = form.title.value.trim();
 
 		if (form.title.value.length == 0) {
@@ -22,6 +30,7 @@
 		}
 
 		form.submit();
+		ArticleWriteForm__submitDone = true;
 
 	}
 </script>

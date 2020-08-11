@@ -5,11 +5,6 @@
 <%@ include file="../part/head.jspf"%>
 
 
-
-
-
-
-
 <div class="table-box con">
 	<table>
 		<colgroup>
@@ -74,9 +69,7 @@
 	<h2 class="con">댓글 작성</h2>
 
 	<script>
-
-	
-	function ArticleWriteReplyFrom__submit(form) {
+	function ArticleWriteReplyForm__submit(form) {
 		form.body.value = form.body.value.trim();
 		if ( form.body.value.length == 0 ) {
 			alert('댓글을 입력해주세요.');
@@ -84,27 +77,72 @@
 			return;
 		}
 
-		// Ajax화 시작
-		$.post(	'./../reply/doWriteReplyAjax',   // 기존 form 의 action을 입력해주고 전송할 데이터를 입력해준다.
-			{	
-				relId : ${param.id},
-				relTypeCode : 'article',
-				body: form.body.value
-				// ajax: true  만약 post를 ./doWriteReplyAjax  Ajax를 붙이지 않는 경우 이렇게 ajax true를 날려주는게 좋다. 
-			},
-			function(data) {
-				form.body.focus();
-			},
-			'json' // 필수 ( data 객체를 자바스크립트로 다루겠다는 의미)
-		);
-		form.body.value = '';
-		// body 를 전송하고 원문을 비워준다. 그래야 댓글창으로 돌아왔을 때, 빈칸으로 입력 가능하다!
+		var startUploadFiles = function(onSuccess) {
+			var fileUploadFormData = new FormData(form);
+
+			if ( form.file__reply__0__common__attachment__1.value.length == 0 && form.file__reply__0__common__attachment__2.value.length == 0 ) {
+				onSuccess();
+				return;
+			} 
+
+			var fileUploadFormData = new FormData(form); 
+			
+			
+			fileUploadFormData.delete("relTypeCode");
+			fileUploadFormData.delete("relId");
+			fileUploadFormData.delete("body");
+			
+			$.ajax({
+				url : './../file/doUploadAjax',
+				data : fileUploadFormData,
+				processData : false,
+				contentType : false,
+				dataType:"json",
+				type : 'POST',
+				success : onSuccess
+			});
+		}
+		var startWriteReply = function(fileIdsStr, onSuccess) {
+			$.ajax({
+				url : './../reply/doWriteReplyAjax',
+				data : {
+					fileIdsStr: fileIdsStr,
+					body: form.body.value,
+					relTypeCode: form.relTypeCode.value,
+					relId: form.relId.value
+				},
+				dataType:"json",
+				type : 'POST',
+				success : onSuccess
+			});
+		};
+		startUploadFiles(function(data) {
+			var idsStr = '';
+			if ( data && data.body && data.body.fileIdsStr ) {
+				idsStr = data.body.fileIdsStr;
+			}
+			startWriteReply(idsStr, function(data) {
+
+				if ( data.msg ) {
+					alert(data.msg);
+				}
+				
+				
+				form.body.value = '';
+				form.file__reply__0__common__attachment__1.value = '';
+				form.file__reply__0__common__attachment__2.value = '';
+			});
+		});
+
+		
 	}
 </script>
 	<!-- <form method="POST" class="form1" action="./doWriteReply"  Ajax화로 method와 action이 의미없어짐 -->
 	<!-- Ajax화로 form은 이제 발송용으로 사용되지 않는다. -->
 	<form class="form1 table-box con"
-		onsubmit="ArticleWriteReplyFrom__submit(this); return false;">
+		onsubmit="ArticleWriteReplyForm__submit(this); return false;">
+		<input type="hidden" name="relTypeCode" value="article" /> 
+		<input type="hidden" name="relId" value="${article.id}" />
 		<table>
 			<tbody>
 				<tr>
@@ -113,6 +151,24 @@
 						<div class="form-control-box">
 							<textarea class="height-100px" placeholder="내용을 입력해주세요."
 								name="body" maxlength="300" autofocus></textarea>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>첨부1 비디오</th>
+					<td>
+						<div class="form-control-box">
+							<input type="file" accept="video/*" capture
+								name="file__reply__0__common__attachment__1">
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>첨부2 비디오</th>
+					<td>
+						<div class="form-control-box">
+							<input type="file" accept="video/*" capture
+								name="file__reply__0__common__attachment__2">
 						</div>
 					</td>
 				</tr>
@@ -314,7 +370,19 @@ function ReplyList__drawReply(reply) {
 	html += '<td>' + reply.id + '</td>';
 	html += '<td>' + reply.regDate + '</td>';
 	html += '<td>' + reply.extra.writer + '</td>';
-	html += '<td class="reply-body">' + reply.body + '</td>';
+	html += '<td>';
+	html += '<div class="reply-body">' + reply.body + '</div>';
+	if (reply.extra.file__common__attachment__1) {
+        var file = reply.extra.file__common__attachment__1;
+        html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
+    }
+
+	if (reply.extra.file__common__attachment__2) {
+        var file = reply.extra.file__common__attachment__2;
+        html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
+	}
+    
+	html += '</td>';
 	html += '<td>';
 	if ( reply.extra.actorCanDelete) {
 		html += '<span class="loading-delete-inline">삭제중입니다...</span>';
@@ -420,6 +488,10 @@ a:hover {
 
 textarea {
 	width: 100%;
+}
+
+.reply-list-box {
+	margin-bottom:50px;
 }
 
 .reply-list-box tr .loading-delete-inline {

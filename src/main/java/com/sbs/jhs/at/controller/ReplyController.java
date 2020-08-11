@@ -8,23 +8,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.sbs.jhs.at.dto.Article;
-import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.Member;
+import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.ResultData;
-import com.sbs.jhs.at.service.ArticleService;
 import com.sbs.jhs.at.service.ReplyService;
 import com.sbs.jhs.at.util.Util;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Controller
-@Slf4j
 public class ReplyController {
 	@Autowired
 	private ReplyService replyService;

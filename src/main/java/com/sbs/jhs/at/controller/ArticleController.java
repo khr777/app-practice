@@ -1,6 +1,5 @@
 package com.sbs.jhs.at.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,11 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
-import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.Member;
+import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.ResultData;
 import com.sbs.jhs.at.service.ArticleService;
-import com.sbs.jhs.at.service.ReplyService;
 import com.sbs.jhs.at.util.Util;
 
 import lombok.extern.slf4j.Slf4j;
@@ -156,10 +154,29 @@ public class ArticleController {
 
 	@RequestMapping("/usr/article/doModify")
 	@ResponseBody
-	public String showDoModify(@RequestParam Map<String, Object> param, int id) {
-
+	public String showDoModify(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
+		
+		
+		
+		Member loginedMember = (Member)request.getAttribute("loginedMember");
+		Article article = articleService.getForPrintArticleById(id);
+		
+		/*
+		 * if ( articleService.actorCanModify(loginedMember, article) == false) { return
+		 * new ResultData("F-1", String.format("%d번 게시물을 수정할 권한이 없습니다.",id )); }
+		 * 
+		 */
+		
+		
+		
+		
+		
+		
+		
 		articleService.modify(param, id);
 
+		
+			
 		String msg = id + "번 게시물이 수정되었습니다.";
 
 		StringBuilder sb = new StringBuilder();

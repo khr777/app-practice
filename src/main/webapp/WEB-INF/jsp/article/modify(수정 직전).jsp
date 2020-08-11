@@ -34,37 +34,37 @@
 	}
 </script>
 
-<form class="form1 table-box con" action="doModify" method="POST"
+<form class="con common-form" action="doModify" method="POST"
 	onsubmit="submitModifyForm(this); return false;">
 	<input type="hidden" name="id" value="${article.id}">
-	<table>
-		<tbody>
-			<tr>
-				<th>제목</th>
-				<td>
-					<div class="form-control-box">
-						<input type="text" autofocus="autofocus" value="${article.title}" name="title"
-							maxlength="100" />
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<th>내용</th>
-				<td>
-					<div class="form-control-box">
-						<textarea placeholder="내용을 입력해주세요." name="body" maxlength="2000">${article.body}</textarea>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<th>작성</th>
-				<td>
-					<button class="btn btn-primary" type="submit">수정</button>
-					<input type="reset" value="취소" onclick="history.back();">
-				</td>
-			</tr>
-		</tbody>
-	</table>
+	<div>
+		<span> 제목 </span>
+		<div>
+			<input name="title" type="text" placeholder="제목"
+				autofocus="autofocus" value="${article.title}">
+		</div>
+	</div>
+
+	<div>
+		<span> 내용 </span>
+		<div>
+			<textarea name="body" placeholder="내용">${article.body}</textarea>
+		</div>
+	</div>
+
+	<div>
+		<span></span>
+		<div>
+			<input type="submit" value="수정"> 
+			<input type="reset" value="취소" onclick="history.back();">
+		</div>
+	</div>
 </form>
+
+<div class="btns con">
+	<a href="./list">게시물 리스트</a> 
+	<a href="./add">게시물 추가</a> 
+	<a onclick="if ( confirm('삭제하시겠습니까?') == false ) return false;"	href="./doDelete?id=${article.id}">게시물 삭제</a>
+</div>
 
 <%@ include file="../part/foot.jspf"%>
