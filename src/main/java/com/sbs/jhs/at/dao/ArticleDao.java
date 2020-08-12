@@ -49,6 +49,8 @@ public interface ArticleDao {
 
 	List<Reply> getForPrintRepliesFrom(@RequestParam Map<String, Object> param);
 
+	void writeRelIdUpdate(@Param("relId")int relId);
+
 
 
 }

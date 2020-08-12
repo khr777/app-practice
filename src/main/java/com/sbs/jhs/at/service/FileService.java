@@ -78,5 +78,8 @@ public class FileService {
 	public File getFileById(int id) {
 		return fileDao.getFileById(id);
 	}
+	public File getFileByRelId(int relId) {
+		return fileDao.getFileByRelId(relId);
+	}
 
 }

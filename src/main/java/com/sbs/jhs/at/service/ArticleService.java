@@ -57,6 +57,9 @@ public interface ArticleService {
 	
 	public boolean actorCanDelete(Member actor, Reply reply);
 
+
+	public void writeRelIdUpdate(int newArticleId);
+	
 	//public List<Reply> getForPrintArticleReplies(int id, int from);
 
 

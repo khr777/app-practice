@@ -39,7 +39,22 @@
 		type2Code = #{type2Code}
 		AND fileNo = #{fileNo}
 	</select>
-
+	<select id="getFileByRelId" resultType="File">
+		SELECT *
+		FROM file
+		WHERE 1
+		AND relId = #{relId}
+	</select>
+	<!-- <select id="getFileByRelId" resultType="File">
+		SELECT id, regDate,
+		updateDate, relTypeCode, relId, originFileName, fileExt,
+		typeCode,
+		type2Code, fileExtTypeCode, fileExtType2Code, fileNo, body,
+		fileSize
+		FROM file
+		WHERE 1
+		AND relId = #{relId}
+	</select> -->
 	<select id="getFileById" resultType="File">
 		SELECT id, regDate,
 		updateDate, relTypeCode, relId, originFileName, fileExt,
@@ -80,23 +95,9 @@
 		AND relTypeCode
 		= #{relTypeCode}
 	</update>
-	
  
  
  
- 	
- 
- <!--  진짜 delete 하지 않고 update 처리하기 위한 샘플 
- <update id="softDeleteReply">
-		UPDATE reply
-		SET
-		delStatus = 1,
-		delDate = NOW(),
-		displayStatus = 0
-		WHERE id = #{id}
-	</update>
- 
- --> 
  
  
  

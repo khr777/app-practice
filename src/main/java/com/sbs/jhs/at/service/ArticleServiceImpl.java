@@ -1,7 +1,6 @@
 package com.sbs.jhs.at.service;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sbs.jhs.at.controller.FileController;
 import com.sbs.jhs.at.dao.ArticleDao;
 import com.sbs.jhs.at.dto.Article;
 import com.sbs.jhs.at.dto.File;
-import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.Member;
-import com.sbs.jhs.at.dto.ResultData;
+import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.util.Util;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,10 +41,10 @@ public class ArticleServiceImpl implements ArticleService {
 	public Article getForPrintArticleById(int id) {
 
 		Article article = articleDao.getForPrintArticleById(id);
-		
-		
+		System.out.println("article : " + article);
 
-		File file = fileService.getFileById(article.getId());
+		File file = fileService.getFileByRelId(article.getRelId());
+		System.out.println("file : " + file);
 
 		if (file != null) { // null 이 아니라는 의미는 파일이 존재한다는 것.
 			article.getExtra().put("file__common__attachment__1", file);
@@ -181,6 +178,11 @@ public class ArticleServiceImpl implements ArticleService {
 	// 액터가 해당 댓글을 삭제할 수 있는지를 알려준다.
 	public boolean actorCanDelete(Member actor, Reply reply) {
 		return actorCanModify(actor, reply);
+	}
+
+	@Override
+	public void writeRelIdUpdate(int newArticleId) {
+		articleDao.writeRelIdUpdate(newArticleId);
 	}
 
 }

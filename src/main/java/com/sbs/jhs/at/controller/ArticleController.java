@@ -119,21 +119,14 @@ public class ArticleController {
 		Map<String, Object> rsDataBody = new HashMap<>();
 		param.put("memberId", request.getAttribute("loginedMemberId"));
 		
-		System.out.println("relId :" +  param.get("relId"));
 		
 		
 		int newArticleId = articleService.write(param);
+		articleService.writeRelIdUpdate(newArticleId);
 		rsDataBody.put("newArticleId", newArticleId);
-
+		
 		String redirectUrl = (String) param.get("redirectUrl");
 		redirectUrl = redirectUrl.replace("#id", newArticleId + "");
-		
-		System.out.println("안되는건가?????/	");
-		System.out.println("relTypeCode : " + param.get("relTypeCode"));
-		System.out.println("relId : " + param.get("relId"));
-		
-		
-		
 		
 		
 		

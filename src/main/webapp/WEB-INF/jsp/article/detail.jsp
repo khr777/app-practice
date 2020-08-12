@@ -36,19 +36,11 @@
 			<tr>
 				<th>내용</th>
 				<td>${article.body}
-				<c:if test="article.extra.file__common__attachment__1">
-					<script>
-					html = '';
-			       var file = ${article.extra.file__common__attachment__1};
-			       html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
-					</script>
+				<c:if test="${article.extra.file__common__attachment__1 != null }">
+				<video controls src="/usr/file/streamVideo?id=${article.extra.file__common__attachment__1.relId}"></video>
 				</c:if>
-				<c:if test="article.extra.file__common__attachment__2"> 
-					<script>
-					html = '';
-					var file = ${article.extra.file__common__attachment__2}; 
-					html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
-					</script>
+				<c:if test="${article.extra.file__common__attachment__2 != null }">
+				<video controls src="/usr/file/streamVideo?id=${file.id}"></video>
 				</c:if>
 					
 				</td>

@@ -64,10 +64,17 @@
 		updateDate = NOW(),
 		displayStatus = 1,
 		title = #{title},
+		relTypeCode = #{relTypeCode},
+		relId = 0,
 		body = #{body},
 		memberId = #{memberId}
 	</insert>
-
+	<update id="writeRelIdUpdate">
+		UPDATE article
+		SET updateDate = NOW(),
+		relId = #{relId}
+		WHERE id = #{relId}
+	</update>
 	<update id="modify" parameterType="map">
 		UPDATE article
 		SET updateDate =
@@ -121,96 +128,7 @@
 
 	</select>
 
-	<insert id="writeReply" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO
-		reply
-		SET regDate = NOW(),
-		updateDate = NOW(),
-		displayStatus = 1,
-		relTypeCode = #{relTypeCode},
-		relId = #{relId},
-		body = #{body},
-		memberId =
-		#{memberId}
-	</insert>
 
-
-	<!-- articleDao.java 에서 해당 메서드의 인자를 articleId로 셋팅해두었기 때문에 #{articleId}로 
-		사용 가능 -->
-	<select id="getForPrintReplies" resultMap="reply">
-		SELECT *
-		FROM
-		reply
-		WHERE displayStatus = 1
-		AND relId = #{relId}
-		relTypeCode = 'article'
-		ORDER
-		BY id DESC
-	</select>
-
-	<select id="getReply" resultMap="reply">
-		SELECT *
-		FROM
-		reply
-		WHERE id = #{id}
-	</select>
-
-	<update id="softDeleteReply">
-		UPDATE reply
-		SET
-		delStatus = 1,
-		delDate = NOW(),
-		displayStatus = 0
-		WHERE id = #{id}
-	</update>
-	<select id="getForPrintReplyById"
-		resultMap="reply">
-		SELECT AR.*,
-		M.nickname AS extra__writer
-		FROM reply AS
-		AR
-		INNER JOIN member AS M
-		ON AR.memberId = M.id
-		WHERE AR.id = #{id}
-		AND
-		AR.displayStatus = 1
-		AND AR.id = #{id}
-	</select>
-
-	
-	<select id="getForPrintRepliesFrom"  resultMap="reply">
-		 <![CDATA[
-		SELECT AR.*,
-		M.nickname AS extra__writer
-		FROM reply AS AR
-		INNER JOIN member AS M
-		ON AR.memberId = M.id
-		WHERE AR.relId = #{relId}
-		AND AR.relTypeCode = #{relTypeCode}
-		AND AR.displayStatus = 1
-		AND AR.id >= #{from}
-		ORDER BY AR.id ASC
-		]]>
-		<!-- 샘은 ORDER BY id ASC 하시고, reverse 사용 안하심 -->
-	</select>
-
-
-
-
-	<resultMap type="Reply" id="reply">
-		<id property="id" column="id" />
-		<id property="regDate" column="regDate" />
-		<id property="updateDate" column="updateDate" />
-		<id property="delDate" column="delDate" />
-		<id property="delStatus" column="delStatus" />
-		<id property="body" column="body" />
-		<id property="memberId" column="memberId" />
-		<id property="relId" column="relId" />
-		<id property="relTypeCode" column="relTypeCode" />
-		<association property="extra" javaType="map">
-			<id property="writer" column="extra__writer" />
-		</association>
-	</resultMap>
 
 
 	<resultMap type="Article" id="article">
@@ -221,6 +139,8 @@
 		<id property="delStatus" column="delStatus" />
 		<id property="body" column="body" />
 		<id property="title" column="title" />
+		<id property="relId" column="relId" />
+		<id property="relTypeCode" column="relTypeCode" />
 		<id property="hit" column="hit" />
 		<id property="memberId" column="memberId" />
 		<association property="extra" javaType="map">

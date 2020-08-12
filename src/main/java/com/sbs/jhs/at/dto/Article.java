@@ -19,6 +19,8 @@ public class Article {
 	private boolean displayStatus;
 	private String title;
 	private String body;
+	private int relId;
+	private String relTypeCode;
 	private int hit;
 	private int memberId;
 	private Map<String, Object> extra;
