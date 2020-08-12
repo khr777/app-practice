@@ -39,9 +39,6 @@ public interface ArticleService {
 	public Integer getForPageMoveAfterArticle(int id);
 
 
-	public int writeReply(@RequestParam Map<String, Object> param);
-
-
 	public List<Reply> getForPrintReplies(@RequestParam Map<String, Object> param);
 
 
@@ -51,7 +48,6 @@ public interface ArticleService {
 	public Reply getReply(int id);
 
 
-	public Map<String, Object> softDeleteReply( int id);
 
 
 	public Reply getForPrintReplyById(int id);

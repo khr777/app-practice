@@ -51,6 +51,19 @@ public class FileService {
 
 		return map;
 	}
+	
+	public File getFilesMapKeyRelId(String relTypeCode, int id, String typeCode, String type2Code,
+			int fileNo) {
+		
+		File file = fileDao.getFileById(id);
+		
+
+		return file;
+
+	}
+	
+	
+	
 
 	public byte[] getFileBodyById(int id) {
 		File file = fileDao.getFileById(id);
@@ -65,4 +78,5 @@ public class FileService {
 	public File getFileById(int id) {
 		return fileDao.getFileById(id);
 	}
+
 }

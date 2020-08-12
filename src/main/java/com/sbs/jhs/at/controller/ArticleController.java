@@ -1,7 +1,9 @@
 package com.sbs.jhs.at.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
+import com.sbs.jhs.at.dto.File;
 import com.sbs.jhs.at.dto.Member;
 import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.ResultData;
@@ -75,12 +78,20 @@ public class ArticleController {
 	// 모든 parameter가 'param'에 다 들어가 있다. 꺼내 쓰기만 하면 된다.
 	@RequestMapping("/usr/article/detail")
 	public String showDetail(Model model, @RequestParam Map<String, Object> param) {
-		
-		
+
 		int id = Util.getAsInt(param.get("id"));
 		articleService.hitUp(id);
 
+		
+		
+		
+		
+		
 		Article article = articleService.getForPrintArticleById(id);
+		
+		
+		
+		
 
 		int beforeId = Util.getAsInt(articleService.getForPageMoveBeforeArticle(id));
 		int afterId = Util.getAsInt(articleService.getForPageMoveAfterArticle(id));
@@ -90,9 +101,9 @@ public class ArticleController {
 
 		model.addAttribute("article", article);
 
-		//List<Reply> replies = articleService.getForPrintReplies(article.getId());
+		// List<Reply> replies = articleService.getForPrintReplies(article.getId());
 
-		//model.addAttribute("replies", replies); // 굽는다.
+		// model.addAttribute("replies", replies); // 굽는다.
 		return "article/detail";
 	}
 
@@ -101,46 +112,60 @@ public class ArticleController {
 		return "article/write";
 	}
 
-	@RequestMapping("/usr/article/doWrite")
-	public String doWrite(@RequestParam Map<String, Object> param, HttpServletRequest request) {
+	// 얘... 아작스... 아님....
+	@RequestMapping("/usr/article/doWriteAjax") // 근데 이거 Ajax 할 필요 없을 것 같음.. ★
+	@ResponseBody // Ajax는 이걸 꼭 해주어야 한다.
+	public ResultData doWriteAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
+		Map<String, Object> rsDataBody = new HashMap<>();
 		param.put("memberId", request.getAttribute("loginedMemberId"));
 		
-		//System.out.println("memberId : " + Util.getAsInt(request.getAttribute("loginedMemberId")));
+		System.out.println("relId :" +  param.get("relId"));
+		
 		
 		int newArticleId = articleService.write(param);
+		rsDataBody.put("newArticleId", newArticleId);
 
 		String redirectUrl = (String) param.get("redirectUrl");
 		redirectUrl = redirectUrl.replace("#id", newArticleId + "");
-		/*
-		 * String msg = newId + "번 게시물이 추가되었습니다.";
-		 * 
-		 * StringBuilder sb = new StringBuilder();
-		 * 
-		 * sb.append("alert('" + msg + "');");
-		 * sb.append("location.replace('./detail?id=" + newId + "');");
-		 * 
-		 * sb.insert(0, "<script>"); sb.append("</script>");
-		 */
-		// Spring Boot의 특징 : 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다.
-		return "redirect:" + redirectUrl;
+		
+		System.out.println("안되는건가?????/	");
+		System.out.println("relTypeCode : " + param.get("relTypeCode"));
+		System.out.println("relId : " + param.get("relId"));
+		
+		
+		
+		
+		
+		
+
+		return new ResultData("S-1", String.format("%d번 게시물이 생성되었습니다.", newArticleId), redirectUrl);
 	}
 
-	@RequestMapping("/usr/article/doWriteReply")
-	public String doWriteReply(@RequestParam Map<String, Object> param) {
-		
-		
-		
-		
-		int newReplyId = articleService.writeReply(param);
-
-		int articleId = Util.getAsInt((String) param.get("articleId"));
-
-		String redirectUrl = (String) param.get("redirectUrl");
-		redirectUrl = redirectUrl.replace("#id", articleId + "");
-
-		// Spring Boot의 특징 : "redirect:" 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다.
-		return "redirect:" + redirectUrl;
-	}
+	/*
+	 * @RequestMapping("/usr/article/doWrite") public String doWrite(@RequestParam
+	 * Map<String, Object> param, HttpServletRequest request) {
+	 * param.put("memberId", request.getAttribute("loginedMemberId"));
+	 * 
+	 * //System.out.println("memberId : " +
+	 * Util.getAsInt(request.getAttribute("loginedMemberId")));
+	 * 
+	 * int newArticleId = articleService.write(param);
+	 * 
+	 * String redirectUrl = (String) param.get("redirectUrl"); redirectUrl =
+	 * redirectUrl.replace("#id", newArticleId + "");
+	 * 
+	 * String msg = newId + "번 게시물이 추가되었습니다.";
+	 * 
+	 * StringBuilder sb = new StringBuilder();
+	 * 
+	 * sb.append("alert('" + msg + "');");
+	 * sb.append("location.replace('./detail?id=" + newId + "');");
+	 * 
+	 * sb.insert(0, "<script>"); sb.append("</script>");
+	 * 
+	 * // Spring Boot의 특징 : 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다. return
+	 * "redirect:" + redirectUrl; }
+	 */
 
 	@RequestMapping("/usr/article/modify")
 	public String showModify(Model model, int id) {
@@ -155,28 +180,18 @@ public class ArticleController {
 	@RequestMapping("/usr/article/doModify")
 	@ResponseBody
 	public String showDoModify(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
-		
-		
-		
-		Member loginedMember = (Member)request.getAttribute("loginedMember");
+
+		Member loginedMember = (Member) request.getAttribute("loginedMember");
 		Article article = articleService.getForPrintArticleById(id);
-		
+
 		/*
 		 * if ( articleService.actorCanModify(loginedMember, article) == false) { return
 		 * new ResultData("F-1", String.format("%d번 게시물을 수정할 권한이 없습니다.",id )); }
 		 * 
 		 */
-		
-		
-		
-		
-		
-		
-		
+
 		articleService.modify(param, id);
 
-		
-			
 		String msg = id + "번 게시물이 수정되었습니다.";
 
 		StringBuilder sb = new StringBuilder();
@@ -211,25 +226,6 @@ public class ArticleController {
 
 	}
 
-	@RequestMapping("/usr/article/doDeleteReply")
-	public String doDeleteReply(Model model, @RequestParam Map<String, Object> param) {
-
-		// 댓글 삭제 가능한지 물어보는 메서드
-		// Map<String, Object> replyDeleteAvailable =
-		// articleService.getReplyDeleteAvailable(id);
-
-		// Map<String, Object> rs = articleService.softDeleteReply(id);
-
-		Map<String, Object> rs = articleService.softDeleteReply(Util.getAsInt(param.get("id")));
-
-		String redirectUrl = (String) param.get("redirectUrl");
-		System.out.println("redirectUrl : " + redirectUrl);
-		int articleId = Util.getAsInt(param.get("articleId"));
-		redirectUrl = redirectUrl.replace("#id", articleId + "");
-		System.out.println("redirectUrl : " + redirectUrl);
-		return "redirect:" + redirectUrl;
-	}
-
 	@RequestMapping("/usr/article/modifyReply")
 	public String showModifyReply(Model model, int id) {
 
@@ -239,11 +235,5 @@ public class ArticleController {
 
 		return "article/modifyReply";
 	}
-
-	
-		
-		
-
-
 
 }

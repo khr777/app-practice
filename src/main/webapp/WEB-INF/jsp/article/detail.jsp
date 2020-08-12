@@ -35,7 +35,23 @@
 			</tr>
 			<tr>
 				<th>내용</th>
-				<td>${article.body }</td>
+				<td>${article.body}
+				<c:if test="article.extra.file__common__attachment__1">
+					<script>
+					html = '';
+			       var file = ${article.extra.file__common__attachment__1};
+			       html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
+					</script>
+				</c:if>
+				<c:if test="article.extra.file__common__attachment__2"> 
+					<script>
+					html = '';
+					var file = ${article.extra.file__common__attachment__2}; 
+					html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
+					</script>
+				</c:if>
+					
+				</td>
 			</tr>
 		</tbody>
 	</table>
@@ -157,7 +173,7 @@
 				form.body.value = '';
 				form.file__reply__0__common__attachment__1.value = '';
 				form.file__reply__0__common__attachment__2.value = '';
-			});
+			});	
 		});
 
 		
@@ -167,8 +183,8 @@
 	<!-- Ajax화로 form은 이제 발송용으로 사용되지 않는다. -->
 	<form class="form1 table-box con"
 		onsubmit="ArticleWriteReplyForm__submit(this); return false;">
-		<input type="hidden" name="relTypeCode" value="article" /> 
-		<input type="hidden" name="relId" value="${article.id}" />
+		<input type="hidden" name="relTypeCode" value="article" /> <input
+			type="hidden" name="relId" value="${article.id}" />
 		<table>
 			<tbody>
 				<tr>
@@ -237,38 +253,32 @@
 
 <style>
 .reply-modify-form-modal {
-	position:fixed;
-	top:0;
-	left:0;
-	right:0;
-	bottom:0;
-	background-color:rgba(0,0,0,0.4);
-	display:none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.4);
+	display: none;
 }
 
 .reply-modify-form-modal-actived .reply-modify-form-modal {
-	display:flex;
+	display: flex;
 }
-
-
-
 </style>
 
-<div class="reply-modify-form-modal flex flex-jc-c flex-ai-c" >
-	<form action="" class="form1  bg-white padding-10" onsubmit="ReplyList__submitModifyForm(this); return false;">
-	<input type="hidden" name="id" />
+<div class="reply-modify-form-modal flex flex-jc-c flex-ai-c">
+	<form action="" class="form1  bg-white padding-10"
+		onsubmit="ReplyList__submitModifyForm(this); return false;">
+		<input type="hidden" name="id" />
 		<div class="form-row">
-			<div class="form-control-label">
-				내용 
-			</div>
+			<div class="form-control-label">내용</div>
 			<div class="form-control-box">
-				<textarea name="body" placeholder="내용을 입력해주세요." autofocus ></textarea>
+				<textarea name="body" placeholder="내용을 입력해주세요." autofocus></textarea>
 			</div>
 		</div>
 		<div class="form-row">
-			<div class="form-control-label">
-				수정 
-			</div>
+			<div class="form-control-label">수정</div>
 			<div class="form-control-box">
 				<button type="submit">수정</button>
 				<button type="button" onclick="ReplyList__hideModifyFormModal();">취소</button>
@@ -280,6 +290,20 @@
 
 
 <script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* function replaceAll(str, searchStr, replaceStr) {
 	return str.split(searchStr).join(replaceStr);
@@ -521,7 +545,7 @@ textarea {
 }
 
 .reply-list-box {
-	margin-bottom:50px;
+	margin-bottom: 50px;
 }
 
 .reply-list-box tr .loading-delete-inline {

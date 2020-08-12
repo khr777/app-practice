@@ -17,7 +17,7 @@ public interface ArticleDao {
 	// 어디에서? articleDao.xml에서.  그리고 articleDao.java에 있으면 xml에 무조건 해당 메서드 쿼리가 있어야 한다. 
 	Article getForPrintArticleById(@Param("id") int id); // @Param("id") 의미 : int id를 "id"라는 이름으로 쓸 수 있다.  
 
-	int write(@RequestParam Map<String, Object> param);
+	void write(@RequestParam Map<String, Object> param);
 
 	int modify(@RequestParam Map<String, Object> param);
 
@@ -33,13 +33,11 @@ public interface ArticleDao {
 
 	Integer getForPageMoveAfterArticle(int id);
 
-	void writeReply(@RequestParam Map<String, Object> param);
 
 	List<Reply> getForPrintReplies(@Param("articleId") int articleId); // @Param("id") 의미 : int id를 "id"라는 이름으로 쓸 수 있다.
 
 	Reply getReply(@Param("id") int id);
 
-	void softDeleteReply(@Param("id") int id);
 
 	Reply getForPrintReplyById(@Param("id") int id);
 	

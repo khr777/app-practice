@@ -20,4 +20,7 @@ public interface FileDao {
 	File getFileById(@Param("id") int id);
 
 	void deleteFiles(@Param("relTypeCode") String relTypeCode, @Param("relId") int relId);
+	
+	
+	File getFile(String relTypeCode, int id, String typeCode, String type2Code, int fileNo); // 잉 이거 중복 있는 듯
 }
