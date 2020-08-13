@@ -15,7 +15,7 @@ public interface ArticleService {
 	public List<Article> getForPrintArticles(@RequestParam Map<String, Object> param, int itemsInAPage, int limitFrom, String searchKeywordType, String searchKeywordTypeBody, String searchKeyword);
 		
 
-	public Article getForPrintArticleById(int id);
+	public Article getForPrintArticleById(int id, Member actor);
 	
 
 	public int write(Map<String, Object> param);
@@ -39,7 +39,6 @@ public interface ArticleService {
 	public Integer getForPageMoveAfterArticle(int id);
 
 
-	public List<Reply> getForPrintReplies(@RequestParam Map<String, Object> param);
 
 
 	public Map<String, Object> getReplyDeleteAvailable(int id);
@@ -53,14 +52,19 @@ public interface ArticleService {
 	public Reply getForPrintReplyById(int id);
 
 
-	public boolean actorCanModify(Member loginedMember, Reply reply);
+	public boolean actorCanModify(Member loginedMember, Article article);
 	
-	public boolean actorCanDelete(Member actor, Reply reply);
+	public boolean actorCanDelete(Member actor, Article article);
 
 
 	public void writeRelIdUpdate(int newArticleId);
+
+
+	public boolean actorCanModify(Member loginedMember, int id);
+
+
+	public ResultData checkActorCanModify(Member loginedMember, int id);
 	
-	//public List<Reply> getForPrintArticleReplies(int id, int from);
 
 
 }

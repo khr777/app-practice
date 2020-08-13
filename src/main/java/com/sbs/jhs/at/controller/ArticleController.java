@@ -81,13 +81,14 @@ public class ArticleController {
 		articleService.hitUp(id);
 
 		
-		Article article = articleService.getForPrintArticleById(id);
-	
+		Member loginedMember = (Member)request.getAttribute("loginedMember");
+		
+		Article article = articleService.getForPrintArticleById(id, loginedMember);
+
 		
 		
 		
-		request.setAttribute("article", article);
-		//model.addAttribute("article", article); request나 결과 똑같음
+		model.addAttribute("article", article); 
 		
 
 		int beforeId = Util.getAsInt(articleService.getForPageMoveBeforeArticle(id));
@@ -110,9 +111,9 @@ public class ArticleController {
 	}
 
 	// 얘... 아작스... 아님....
-	@RequestMapping("/usr/article/doWriteAjax") // 근데 이거 Ajax 할 필요 없을 것 같음.. ★
+	@RequestMapping("/usr/article/doWrite") // 근데 이거 Ajax 할 필요 없을 것 같음.. ★
 	@ResponseBody // Ajax는 이걸 꼭 해주어야 한다.
-	public ResultData doWriteAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
+	public String doWriteAjax(@RequestParam Map<String, Object> param, HttpServletRequest request) {
 		Map<String, Object> rsDataBody = new HashMap<>();
 		param.put("memberId", request.getAttribute("loginedMemberId"));
 		
@@ -123,13 +124,17 @@ public class ArticleController {
 		articleService.writeRelIdUpdate(newArticleId);
 		rsDataBody.put("newArticleId", newArticleId);
 		
-		String redirectUrl = (String) param.get("redirectUrl");
-		redirectUrl = redirectUrl.replace("#id", newArticleId + "");
+		String redirectUri = (String) param.get("redirectUri");
+		redirectUri = redirectUri.replace("#id", newArticleId + "");
 		
+		String msg = newArticleId + "번 게시물이 추가되었습니다.";
+		StringBuilder sb = new StringBuilder();
+		sb.append("alert('" + msg + "');");
+		sb.append("location.replace('./detail?id=" + newArticleId + "');");
+		sb.insert(0, "<script>"); sb.append("</script>");
 		
-		
-
-		return new ResultData("S-1", String.format("%d번 게시물이 생성되었습니다.", newArticleId), redirectUrl);
+		 // Spring Boot의 특징 : 이런식으로 하면 jsp에서 지정한 param->redirectUrl로 이동한다. 
+		 return sb.toString(); 
 	}
 
 	/*
@@ -159,9 +164,11 @@ public class ArticleController {
 	 */
 
 	@RequestMapping("/usr/article/modify")
-	public String showModify(Model model, int id) {
-
-		Article article = articleService.getForPrintArticleById(id);
+	public String showModify(Model model, int id, HttpServletRequest request) {
+		
+		Member loginedMember = (Member)request.getAttribute("loginedMember");
+		
+		Article article = articleService.getForPrintArticleById(id, loginedMember);
 
 		model.addAttribute("article", article);
 
@@ -169,36 +176,47 @@ public class ArticleController {
 	}
 
 	@RequestMapping("/usr/article/doModify")
-	@ResponseBody
-	public String showDoModify(@RequestParam Map<String, Object> param, int id, HttpServletRequest request) {
+	public String doModify(@RequestParam Map<String, Object> param, int id, HttpServletRequest request, Model model) {
+		
+		Map<String, Object> newParam = Util.getNewMapOf(param, "title", "body", "fileIdsStr", "articleId","id");
+		Member loginedMember = (Member)request.getAttribute("loginedMember");
+		
+		// boolean actorCanModify = articleService.actorCanModify(loginedMember, id);
+		
+		ResultData checkActorCanModifyResultData = articleService.checkActorCanModify(loginedMember, id);
+		
+		if ( checkActorCanModifyResultData.isFail() ) {
+			model.addAttribute("historyBack", true);
+			model.addAttribute("msg", checkActorCanModifyResultData.getMsg());
+			
+			return "common/redirect";
+		}
+		
+		
+		  String redirectUri = (String) param.get("redirectUri");
+		 
+	
+		articleService.modify(newParam, id);
+		System.out.println("파람 " + newParam);
 
-		Member loginedMember = (Member) request.getAttribute("loginedMember");
-		Article article = articleService.getForPrintArticleById(id);
-		System.out.println("힘들다" + article);
-		System.out.println("힘들다" + id);
 		/*
-		 * if ( articleService.actorCanModify(loginedMember, article) == false) { return
-		 * new ResultData("F-1", String.format("%d번 게시물을 수정할 권한이 없습니다.",id )); }
+		 * String msg = id + "번 게시물이 수정되었습니다.";
 		 * 
+		 * StringBuilder sb = new StringBuilder();
+		 * 
+		 * sb.append("alert('" + msg + "');");
+		 * sb.append("location.replace('./detail?id=" + id + "');");
+		 * 
+		 * sb.insert(0, "<script>"); sb.append("</script>");
+		 * 
+		 * return sb.toString();
 		 */
-
-		articleService.modify(param, id);
-
-		String msg = id + "번 게시물이 수정되었습니다.";
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("alert('" + msg + "');");
-		sb.append("location.replace('./detail?id=" + id + "');");
-
-		sb.insert(0, "<script>");
-		sb.append("</script>");
-
-		return sb.toString();
+		
+		return "redirect:" + redirectUri;
 
 	}
 
-	@RequestMapping("/usr/article/delete")
+	@RequestMapping("/usr/article/doDelete")
 	@ResponseBody
 	public String showDelete(int id) {
 
@@ -218,14 +236,5 @@ public class ArticleController {
 
 	}
 
-	@RequestMapping("/usr/article/modifyReply")
-	public String showModifyReply(Model model, int id) {
-
-		Reply reply = articleService.getForPrintReplyById(id);
-
-		model.addAttribute("reply", reply);
-
-		return "article/modifyReply";
-	}
 
 }

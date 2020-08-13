@@ -36,33 +36,20 @@ public class ReplyService {
 		if ( replyIds.size() > 0 ) {   // common : 범용, attachment : 첨부파일, 1 : 첫번째 파일 을 가져와봐. 하는 함수
 			
 			
-			Map<Integer, File> filesMap = fileService.getFilesMapKeyRelId("reply", replyIds, "common", "attachment", 1);
+			Map<Integer, Map<Integer, File>> filesMap = fileService.getFilesMapKeyRelIdAndFileNo("reply", replyIds, "common", "attachment");
 			// 그냥 List가 아닌 map으로 가져온다.
 
 			for ( Reply reply : replies ) {
-				File file = filesMap.get(reply.getId());
+				Map<Integer, File> filesMap2 = filesMap.get(reply.getId());
 
-				if ( file != null ) {  // null 이 아니라는 의미는 파일이 존재한다는 것.
-					reply.getExtra().put("file__common__attachment__1", file);
-					// 파일이 존재한다면 댓글의 extra에 "file__~~" 변수명으로 file을 저장하는 것.
+				if (filesMap2 != null) {
+					reply.getExtra().put("file__common__attachment", filesMap2);
 				}
+			
+			
 			}
-			
-			
-			filesMap = fileService.getFilesMapKeyRelId("reply", replyIds, "common", "attachment", 2);
-
-			for (Reply reply : replies) {
-				File file = filesMap.get(reply.getId());
-
-				if (file != null) {
-					reply.getExtra().put("file__common__attachment__2", file);
-				}
-			}
-			
-			
+		
 		}
-		
-		
 		
 
 		Member actor = (Member) param.get("actor");

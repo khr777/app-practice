@@ -30,6 +30,23 @@
 	</select>
 
 
+
+
+
+
+
+
+	<select id="getArticleById" resultMap="article">
+		SELECT *
+		FROM article
+		WHERE
+		id = ${id}
+	</select>
+
+
+
+
+
 	<select id="getForPrintArticleById" resultMap="article">
 		SELECT AR.*,
 		M.nickname AS extra__writer
@@ -66,7 +83,8 @@
 		title = #{title},
 		relTypeCode = #{relTypeCode},
 		relId = 0,
-		body = #{body},
+		body =
+		#{body},
 		memberId = #{memberId}
 	</insert>
 	<update id="writeRelIdUpdate">
@@ -75,12 +93,15 @@
 		relId = #{relId}
 		WHERE id = #{relId}
 	</update>
+
+
 	<update id="modify" parameterType="map">
 		UPDATE article
-		SET updateDate =
-		NOW(),
-		title = #{title},
-		body = #{body}
+		<set>
+			updateDate = NOW(),
+			<if test="title != null">title = #{title},</if>
+			<if test="body != null">body = #{body},</if>
+		</set>
 		WHERE id = #{id}
 	</update>
 

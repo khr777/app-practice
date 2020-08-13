@@ -4,15 +4,21 @@
 <c:set var="pageTitle" value="게시물 작성" />
 <%@ include file="../part/head.jspf"%>
 
+
+
+<!-- form으로 파일 전송하려면 원래 정석으로는 enctype="multipart/form-data" 를 <form ~ 안에 써주어야 한다. -->
 <!-- <textarea></textarea> 는 필히 붙여서 써야 placeholder가 나타난다 -->
 <form method="POST" class="form1 table-box con" action="doWrite"
 	onsubmit="ArticleWriteForm__submit(this); return false;">
-	<input type="hidden" name="redirectUrl"
-		value="/usr/article/detail?id=#id"> <input type="hidden"
+	<input type="hidden" name="redirectUri" value="/article/detail?id=#id"> <input type="hidden"
 		name="loginedMemberId" value="${loginedMemberId}" /> <input
 		type="hidden" name="relTypeCode" value="article" /> <input
 		type="hidden" name="relId" value="${param.id}" />
+		<input type="hidden" name="fileIdsStr"/>
 	<table>
+		<colgroup>
+			<col width="100"></col>
+		</colgroup>
 		<tbody>
 			<tr>
 				<th>제목</th>
@@ -89,6 +95,28 @@
 		}
 
 
+		var maxSizeMb = 50;
+		var maxSize = maxSizeMb * 1024 * 1024 // 50MB
+
+		if ( form.file__article__0__common__attachment__1.value ) {
+			if ( form.file__article__0__common__attachment__1.files[0].size > maxSize ) {
+				alert(maxSize + "MB 이하의 파일을 업로드 해주세요.");
+				return;
+			}
+		}
+
+		if ( form.file__article__0__common__attachment__2.value ) {
+			if ( form.file__article__0__common__attachment__2.files[0].size > maxSize ) {
+				alert(maxSize + "MB 이하의 파일을 업로드 해주세요.");
+				return;
+			}
+		}
+
+
+
+
+
+		
 		// 실행순서 : 1번 __ 댓글&동영상 파일 업로드 작업에서 제일 먼저 실행되는 JS
 		var startUploadFiles = function(onSuccess) {
 			
@@ -101,13 +129,6 @@
 
 			// 갑자기 new FormData(form)이 나온 이유 : Ajax로 파일을 전송하려면 어쩔 수 없이 꼭 객체를 선언해주어야 한다.
 			var fileUploadFormData = new FormData(form);
-			
-			// 파일을 먼저 전송할 때, 필요하지 않은 자료를 지우는 코드 (파일 전송 시, 파일만 있으면 된다.)
-			// ArticleWriteReplyForm__submit  form을 보면 파일 전송시 필요없는 것들을 form 전송하고 있는 것을 확인할 수 있다.  
-			fileUploadFormData.delete("relTypeCode");
-			fileUploadFormData.delete("redirectUrl");
-			fileUploadFormData.delete("body");
-			fileUploadFormData.delete("loginedMemberId");
 
 			// 파일을 보내는 코드( 방식은 정해져있다. 준수해야 한다. 특히 processData, contentType은 꼭 false를 해주어야 한다.)
 			// 2 startUploadFiles ajax 호출 시작  1시
@@ -125,66 +146,25 @@
 			// 3 startUploadFiles ajax 호출 끝   2시
 		}
 
-		// 첨부된 파일이 있다면 전달받은 파일 정보들과 댓글을 함께 조합?하여 전송하는 것이다. 
-		var startWriteReply = function(fileIdsStr, onSuccess) {
 
-			// 6  startWriteReply ajax 호출
-			$.ajax({
-				url : './../article/doWriteAjax',
-				data : {
-					fileIdsStr: fileIdsStr,
-					body: form.body.value,
-					redirectUrl: form.redirectUrl.value,	
-					title: form.title.value,
-					relTypeCode: form.relTypeCode.value,
-					relId: form.relId.value
-				},
-				dataType:"json",
-				type : 'POST',
-				success : onSuccess
-			});
-
-			// 7  startWriteReply ajax 호출 완료
-		};
-
-		
-		// funciont(data) { ~~~~~~ 부터가 onSuccess 이다! }
-		// startUploadFiles가 먼저 실행이 다~~되고 일을 끝낸 후에! (function(data) == onSuccess가 실행되는 순서이다! )
+		ArticleWriteForm__submitDone = true;
 		startUploadFiles(function(data) {
-			// 4  startUploadFiles ajax 호출 결과 도착
-			var idsStr = '';
+
+			var fileIdsStr = '';
+
 			if ( data && data.body && data.body.fileIdsStr ) {
-				idsStr = data.body.fileIdsStr;
+				fileIdsStr = data.body.fileIdsStr;
 			}
 
-			// startWriteReply가 먼저 다 ~~ 실행되고 완료 된 후에, (function(data){ ~~~가 실행되는 것이다.
-			// 5  startWriteReply 함수 호출
-			startWriteReply(idsStr, function(data) {
-				// 8  startWriteReply ajax 호출결과 도착
-				if ( data.msg ) {
-					alert(data.msg);
-				}
-				
+			form.fileIdsStr.value = fileIdsStr;
+			form.file__article__0__common__attachment__1.value = '';
+			form.file__article__0__common__attachment__2.value = '';
+			
 
-				// 이렇게 값들을 비워주기 때문에 댓글&파일 전송을 한 후, 기본값(무)으로 돌아오게 되는 것이다.
-				// 이렇게 해주지 않을 경우 댓글&파일을 전송한 후에도 좀 전에 전송한 내용이 그대로 남아있을 것이다.
-				form.body.value = '';
-				form.file__article__0__common__attachment__1.value = '';
-				form.file__article__0__common__attachment__2.value = '';
-
-				if ( data.resultCode.substr(0, 2) == 'S-' ) {
-					var id = data.body.substr(0, 26);
-					location.replace(id);
-				}
-
-			});
+			
+			form.submit();
+			
 		});
-
-
-		//form.submit();
-		
-		ArticleWriteForm__submitDone = true;
-	
 	}
 	
 </script>

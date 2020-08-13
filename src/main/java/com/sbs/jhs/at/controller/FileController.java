@@ -108,19 +108,63 @@ public class FileController {
 				String fileExtType2Code = Util.getFileExtType2CodeFromFileName(multipartFile.getOriginalFilename());
 				String fileExt = Util.getFileExtFromFileName(multipartFile.getOriginalFilename()).toLowerCase();
 				int fileSize = (int)multipartFile.getSize();
+				
+				
+				int oldFileId = fileService.getFileId(relTypeCode, relId, typeCode, type2Code, fileNo);
+			
+				
+				boolean needToUpdate = oldFileId > 0;
+				
+				
+				if ( needToUpdate ) {
+					
+					fileCache.refresh(oldFileId);
+					fileService.updateFile(oldFileId, originFileName, fileExtTypeCode, fileExtType2Code, fileExt, fileBytes, fileSize);
+					
+				}
+				else {
 
-				int fileId = fileService.saveFile(relTypeCode, relId, typeCode, type2Code, fileNo, originFileName,
-						fileExtTypeCode, fileExtType2Code, fileExt, fileBytes, fileSize);
+					int fileId = fileService.saveFile(relTypeCode, relId, typeCode, type2Code, fileNo, originFileName,
+							fileExtTypeCode, fileExtType2Code, fileExt, fileBytes, fileSize);
 
-				fileIds.add(fileId);
+					fileIds.add(fileId);						
+				}
 			}
 		}
+		
+		int deleteCount = 0;
+		
+		for (String inputName : param.keySet()) {
+			String[] inputNameBits = inputName.split("__");
 
+			if (inputNameBits[0].equals("deleteFile")) {
+				String relTypeCode = inputNameBits[1];
+				int relId = Integer.parseInt(inputNameBits[2]);
+				String typeCode = inputNameBits[3];
+				String type2Code = inputNameBits[4];
+				int fileNo = Integer.parseInt(inputNameBits[5]);
+				
+				
+				int oldFileId = fileService.getFileId(relTypeCode, relId, typeCode, type2Code, fileNo);
+			
+				
+				boolean needToDelete = oldFileId > 0;
+				
+				
+				if ( needToDelete ) {
+					fileService.deleteFile(oldFileId);
+					fileCache.refresh(oldFileId);
+					deleteCount++;
+				}
+			}
+		}
+		
+		
 		Map<String, Object> rsDataBody = new HashMap<>();
 		rsDataBody.put("fileIdsStr", Joiner.on(",").join(fileIds));
 		rsDataBody.put("fileIds", fileIds);
 
-		return new ResultData("S-1", String.format("%d개의 파일을 저장했습니다.", fileIds.size()), rsDataBody);
+		return new ResultData("S-1", String.format("%d개의 파일을 저장했습니다. %d개 파일을 삭제했습니다.", fileIds.size(), deleteCount), rsDataBody);
 	}
 
 	// 다중 파일 업로드가 가능하도록 설계되어 있다.   반복문을 통해서.	

@@ -23,27 +23,35 @@
 
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-		<!-- 자바의 Jquery같은 녀석. 구글에서 만든 자바로 클린한 코드를 작성 하기 위한 구조들을 만들어 놓은 라이브러리 이다. 대표적인 클래스는 AbstractService등이 
-			있다. -->
+		<!-- 자바의 Jquery같은 녀석. 구글에서 만든 자바로 클린한 코드를 작성 하기 위한 구조들을 만들어 놓은 라이브러리 이다. 
+			대표적인 클래스는 AbstractService등이 있다. -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
 		</dependency>
-		
-<!-- 		댓글 동영상 기능 추가하면서 추가한 dependency 2개 -->
-<!-- 근데 리액티브 웹 모듈 제거하고, 스트리밍에 구아바 캐시 적용하면서 삭제하셨음 -->
-<!-- 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
+
+		<!-- 댓글 동영상 기능 추가하면서 추가한 dependency 2개 -->
+		<!-- 근데 리액티브 웹 모듈 제거하고, 스트리밍에 구아바 캐시 적용하면서 삭제하셨음 -->
+		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-webflux</artifactId> 
+			</dependency> <dependency> <groupId>io.projectreactor</groupId> <artifactId>reactor-test</artifactId> 
+			<scope>test</scope> </dependency> -->
+
+
+
+		<!-- 메일 보내기 위한 -->
 		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
 		</dependency>
- -->		
-		
+
+		<!-- 메일 보내기 위한 -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
 		<!-- 스프링 JDBC -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

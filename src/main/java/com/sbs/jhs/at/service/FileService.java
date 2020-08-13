@@ -1,6 +1,7 @@
 package com.sbs.jhs.at.service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class FileService {
 
 	public Map<Integer, File> getFilesMapKeyRelId(String relTypeCode, List<Integer> relIds, String typeCode,
 			String type2Code, int fileNo) {
-		List<File> files = fileDao.getFiles(relTypeCode, relIds, typeCode, type2Code, fileNo);
+		List<File> files = fileDao.getFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2CodeAndFileNo(relTypeCode, relIds, typeCode, type2Code, fileNo);
 		Map<Integer, File> map = new HashMap<>();
 
 		for (File file : files) {
@@ -99,5 +100,63 @@ public class FileService {
 
 		fileDao.update(param);
 	}
+	public List<File> getFilesMapKeyFileNo(String relTypeCode, int relId, String typeCode, String type2Code) {
+		
+		List<File> files = fileDao.getFilesRelTypeCodeAndRelIdAndTypeCodeAndType2Code(relTypeCode, relId, typeCode, type2Code);
+		
+		return files;
+	}
+	
+	
+	public Map<Integer, Map<Integer, File>> getFilesMapKeyRelIdAndFileNo(String relTypeCode, List<Integer> relIds, String typeCode,
+			String type2Code) {
+		List<File> files = fileDao.getFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code(relTypeCode, relIds, typeCode, type2Code);
+		Map<Integer, File> map = new HashMap<>();
+
+		Map<Integer, Map<Integer, File>> rs = new LinkedHashMap<>();
+
+		for (File file : files) {
+			if ( rs.containsKey(file.getRelId()) == false ) {
+				rs.put(file.getRelId(), new LinkedHashMap<>());
+			}
+
+			rs.get(file.getRelId()).put(file.getFileNo(), file);
+		}
+
+		return rs;
+	}
+	public int getFileId(String relTypeCode, int relId, String typeCode, String type2Code, int fileNo) {
+		
+		Integer id = fileDao.getFileId(relTypeCode, relId, typeCode, type2Code, fileNo);
+		
+		if ( id == null ) {
+			return -1;
+		}
+		
+		
+		return id;
+	}
+	public void updateFile(int id, String originFileName, String fileExtTypeCode, String fileExtType2Code,
+			String fileExt, byte[] fileBytes, int fileSize) {
+		
+		Map<String, Object> param = new HashMap();
+		param.put("originFileName", originFileName);
+		param.put("fileExtTypeCode", fileExtTypeCode);
+		param.put("fileExtType2Code", fileExtType2Code);
+		param.put("fileExt", fileExt);
+		param.put("body", fileBytes);
+		param.put("fileSize", fileSize);
+		param.put("id", id);
+
+		fileDao.update(param);
+
+	}
+	public void deleteFile(int id) {
+		fileDao.deleteFile(id);
+	}
+	
+	
+	
+	
 
 }

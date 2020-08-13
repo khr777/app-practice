@@ -4,17 +4,108 @@
 <c:set var="pageTitle" value="게시물 수정" />
 <%@ include file="../part/head.jspf"%>
 
-<form class="form1 table-box con" action="doModify" method="POST"
-	onsubmit="submitModifyForm(this); return false;">
-	<input type="hidden" name="id" value="${article.id}">
+<script>
+	var ArticleModifyForm__submitDone = false;
+	function ArticleModifyForm__submit(form) {
+		var fileInput1 = form["file__article__" + param.id
+				+ "__common__attachment__1"];
+		var fileInput2 = form["file__article__" + param.id
+				+ "__common__attachment__2"];
+
+		var deleteFileInput1 = form["deleteFile__article__" + param.id
+				+ "__common__attachment__1"];
+		var deleteFileInput2 = form["deleteFile__article__" + param.id
+				+ "__common__attachment__2"];
+		if (deleteFileInput1.checked) {
+			fileInput1.value = '';
+		}
+		if (deleteFileInput2.checked) {
+			fileInput2.value = '';
+		}
+
+		if (ArticleModifyForm__submitDone) {
+			alert('처리중입니다.');
+			return;
+		}
+		form.title.value = form.title.value.trim();
+		if (form.title.value.length == 0) {
+			form.title.focus();
+			alert('제목을 입력해주세요.');
+			return;
+		}
+		form.body.value = form.body.value.trim();
+		if (form.body.value.length == 0) {
+			form.body.focus();
+			alert('내용을 입력해주세요.');
+			return;
+		}
+		var maxSizeMb = 50;
+		var maxSize = maxSizeMb * 1024 * 1024 //50MB
+		if (fileInput1.value) {
+			if (fileInput1.files[0].size > maxSize) {
+				alert(maxSizeMb + "MB 이하의 파일을 업로드 해주세요.");
+				return;
+			}
+		}
+		if (fileInput2.value) {
+			if (fileInput2.files[0].size > maxSize) {
+				alert(maxSizeMb + "MB 이하의 파일을 업로드 해주세요.");
+				return;
+			}
+		}
+		var startUploadFiles = function(onSuccess) {
+			if (fileInput1.value.length == 0 && fileInput2.value.length == 0) {
+				if (deleteFileInput1.checked == false
+						&& deleteFileInput2.checked == false) {
+					onSuccess();
+					return;
+				}
+			}
+			var fileUploadFormData = new FormData(form);
+			$.ajax({
+				url : './../file/doUploadAjax',
+				data : fileUploadFormData,
+				processData : false,
+				contentType : false,
+				dataType : "json",
+				type : 'POST',
+				success : onSuccess
+			});
+		}
+		ArticleModifyForm__submitDone = true;
+		startUploadFiles(function(data) {
+			var fileIdsStr = '';
+			if (data && data.body && data.body.fileIdsStr) {
+				fileIdsStr = data.body.fileIdsStr;
+			}
+			form.fileIdsStr.value = fileIdsStr;
+			fileInput1.value = '';
+			fileInput2.value = '';
+			form.submit();
+		});
+	}
+</script>
+<form class="table-box con form1" method="POST" action="doModify"
+	onsubmit="ArticleModifyForm__submit(this); return false;">
+	<input type="hidden" name="fileIdsStr" /> <input type="hidden"
+		name="redirectUri" value="/usr/article/detail?id=${article.id}" /> <input
+		type="hidden" name="id" value="${article.id}" />
 	<table>
 		<tbody>
+			<tr>
+				<th>번호</th>
+				<td>${article.id}</td>
+			</tr>
+			<tr>
+				<th>날짜</th>
+				<td>${article.regDate}</td>
+			</tr>
 			<tr>
 				<th>제목</th>
 				<td>
 					<div class="form-control-box">
-						<input type="text" autofocus="autofocus" value="${article.title}" name="title"
-							maxlength="100" />
+						<input type="text" value="${article.title}" name="title"
+							placeholder="제목을 입력해주세요." />
 					</div>
 				</td>
 			</tr>
@@ -22,176 +113,71 @@
 				<th>내용</th>
 				<td>
 					<div class="form-control-box">
-						<textarea placeholder="내용을 입력해주세요." name="body" maxlength="2000">${article.body}</textarea>
+						<textarea name="body" placeholder="내용을 입력해주세요.">${article.body}</textarea>
 					</div>
 				</td>
 			</tr>
 			<tr>
-			<tr>
-				<th>첨부1 비디오</th>
+				<th>첨부 파일 1</th>
 				<td>
 					<div class="form-control-box">
-						<input type="file" accept="video/*" capture
-							name="file__article__0__common__attachment__1">
-							${article.extra.file__common__attachment__1.originFileName}
-					</div>
+						<input type="file" accept="video/*"
+							name="file__article__${article.id}__common__attachment__1" />
+					</div> <c:if
+						test="${article.extra.file__common__attachment['1'] != null}">
+						<div class="video-box">
+							<video controls
+								src="/usr/file/streamVideo?id=${article.extra.file__common__attachment['1'].id}&updateDate=${article.extra.file__common__attachment['1'].updateDate}">video
+								not supported
+							</video>
+						</div>
+					</c:if>
 				</td>
 			</tr>
 			<tr>
-			<tr>
-				<th>첨부2 비디오</th>
+				<th>첨부 파일 1 삭제</th>
 				<td>
 					<div class="form-control-box">
-						<input type="file" accept="video/*" capture
-							name="file__article__0__common__attachment__2">
-							${article.extra.file__common__attachment__2.originFileName}
+						<label><input type="checkbox"
+							name="deleteFile__article__${article.id}__common__attachment__1"
+							value="Y" /> 삭제 </label>
 					</div>
 				</td>
 			</tr>
-				<th>작성</th>
+			<tr>
+				<th>첨부 파일 2</th>
 				<td>
-					<button class="btn btn-primary" type="submit">수정</button>
-					<input type="reset" value="취소" onclick="history.back();">
+					<div class="form-control-box">
+						<input type="file" accept="video/*"
+							name="file__article__${article.id}__common__attachment__2" />
+					</div> <c:if
+						test="${article.extra.file__common__attachment['2'] != null}">
+						<div class="video-box">
+							<video controls
+								src="/usr/file/streamVideo?id=${article.extra.file__common__attachment['2'].id}&updateDate=${article.extra.file__common__attachment['2'].updateDate}">video
+								not supported
+							</video>
+						</div>
+					</c:if>
+				</td>
+			</tr>
+			<tr>
+				<th>첨부 파일 2 삭제</th>
+				<td>
+					<div class="form-control-box">
+						<label><input type="checkbox"
+							name="deleteFile__article__${article.id}__common__attachment__2"
+							value="Y" /> 삭제 </label>
+					</div>
 				</td>
 			</tr>
 		</tbody>
 	</table>
+
+	<div class="btn-box margin-top-20">
+		<button type="submit" class="btn btn-primary">수정</button>
+	</div>
 </form>
-
-
-
-<script>
-	var submitModifyFormDone = false;
-
-	
-	function submitModifyForm(form) {
-
-		if ( submitModifyFormDone ) {
-			alert('처리중입니다.');
-			return;
-		}
-
-		
-		form.title.value = form.title.value.trim();
-		if (form.title.value.length == 0) {
-			alert('제목을 입력해주세요.');
-			form.title.focus();
-			return false;
-		}
-		form.body.value = form.body.value.trim();
-		if (form.body.value.length == 0) {
-			alert('내용을 입력해주세요.');
-			form.body.focus();
-			return false;
-		}
-
-
-		// 실행순서 : 1번 __ 댓글&동영상 파일 업로드 작업에서 제일 먼저 실행되는 JS
-		var startUploadFiles = function(onSuccess) {
-			
-			// 의미 : 파일 첨부를 하지 않았을 때에는 바로 onSuccess();를 해버린다.
-			// var fileUploadFormData = new  ~~~ $.ajax({ url ~~ 과정을 스킵하고 바로 onSuccess 작업이 실행되게 하는 코드! 다음 단계로 넘어가버리는!
-			if ( form.file__article__0__common__attachment__1.value.length == 0 && form.file__article__0__common__attachment__2.value.length == 0 ) {
-				onSuccess();
-				return;
-			}
-
-			// 갑자기 new FormData(form)이 나온 이유 : Ajax로 파일을 전송하려면 어쩔 수 없이 꼭 객체를 선언해주어야 한다.
-			var fileUploadFormData = new FormData(form);
-			
-			// 파일을 먼저 전송할 때, 필요하지 않은 자료를 지우는 코드 (파일 전송 시, 파일만 있으면 된다.)
-			// ArticleWriteReplyForm__submit  form을 보면 파일 전송시 필요없는 것들을 form 전송하고 있는 것을 확인할 수 있다.  
-			fileUploadFormData.delete("relTypeCode");
-			fileUploadFormData.delete("body");
-
-			// 파일을 보내는 코드( 방식은 정해져있다. 준수해야 한다. 특히 processData, contentType은 꼭 false를 해주어야 한다.)
-			// 2 startUploadFiles ajax 호출 시작  1시
-			$.ajax({
-				url : './../file/doUpDateUploadAjax',
-				data : fileUploadFormData,
-				processData : false,
-				contentType : false,
-				dataType:"json",
-				type : 'POST',
-				success : onSuccess // 얘는 실행순서 1번의 function(onSuccesss)를 의미한다. // 1년뒤 
-				// 위에서부터 아래로 실행 순서와는 상관없이 success는 실행되고 아주 한참뒤에 실행되는 아이.
-			});
-			// 파일을 전송하고 얻은 자료를 onSuccess한테 전달하는 역할을 한다. onSuccess가 뭔데?  
-			// 3 startUploadFiles ajax 호출 끝   2시
-		}
-
-		/* // 첨부된 파일이 있다면 전달받은 파일 정보들과 댓글을 함께 조합?하여 전송하는 것이다. 
-		var startWriteReply = function(fileIdsStr, onSuccess) {
-
-			// 6  startWriteReply ajax 호출
-			$.ajax({
-				url : './../article/doModify',
-				data : {
-					fileIdsStr: fileIdsStr,
-					body: form.body.value,
-					redirectUrl: form.redirectUrl.value,	
-					title: form.title.value,
-					relTypeCode: form.relTypeCode.value,
-					relId: form.relId.value
-				},
-				dataType:"json",
-				type : 'POST',
-				success : onSuccess
-			});
-
-			// 7  startWriteReply ajax 호출 완료
-		};
- */
-
-
-
- 
-
-
-
-	
-		// funciont(data) { ~~~~~~ 부터가 onSuccess 이다! }
-		// startUploadFiles가 먼저 실행이 다~~되고 일을 끝낸 후에! (function(data) == onSuccess가 실행되는 순서이다! )
-		startUploadFiles(function(data) {
-			// 4  startUploadFiles ajax 호출 결과 도착
-			var idsStr = '';
-			if ( data && data.body && data.body.fileIdsStr ) {
-				idsStr = data.body.fileIdsStr;
-			}
-
-			// startWriteReply가 먼저 다 ~~ 실행되고 완료 된 후에, (function(data){ ~~~가 실행되는 것이다.
-			// 5  startWriteReply 함수 호출
-			startWriteReply(idsStr, function(data) {
-				// 8  startWriteReply ajax 호출결과 도착
-				if ( data.msg ) {
-					alert(data.msg);
-				}
-				
-
-				// 이렇게 값들을 비워주기 때문에 댓글&파일 전송을 한 후, 기본값(무)으로 돌아오게 되는 것이다.
-				// 이렇게 해주지 않을 경우 댓글&파일을 전송한 후에도 좀 전에 전송한 내용이 그대로 남아있을 것이다.
-				form.body.value = '';
-				form.file__article__0__common__attachment__1.value = '';
-				form.file__article__0__common__attachment__2.value = '';
-
-				if ( data.resultCode.substr(0, 2) == 'S-' ) {
-					var id = data.body.substr(0, 26);
-					location.replace(id);
-				}
-
-			});
-		});
-		
-
-
-
-
-
-		
-		form.submit();
-		submitModifyFormDone = true;
-	}
-</script>
 
 
 <%@ include file="../part/foot.jspf"%>

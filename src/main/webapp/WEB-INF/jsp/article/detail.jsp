@@ -37,17 +37,33 @@
 				<th>내용</th>
 				<td>${article.body}</td>
 			</tr>
-			<tr>
-				<th>첨부 영상</th>
-				<td>
-					<c:if test="${article.extra.file__common__attachment__1 != null }">
-						<video controls src="/usr/file/streamVideo?id=${article.extra.file__common__attachment__1.id}"></video>
-					</c:if> 
-					<c:if test="${article.extra.file__common__attachment__2 != null }">
-						<video controls	src="/usr/file/streamVideo?id=${article.extra.file__common__attachment__2.id}"></video>
-					</c:if>
-				</td>
-			</tr>
+			<c:if test="${article.extra.file__common__attachment['1'] != null }">
+				<tr>
+					<th>첨부 파일 1</th>
+					<td>
+						<div class="video-box">
+							<video controls
+								src="/usr/file/streamVideo?id=${article.extra.file__common__attachment['1'].id}&updateDate=${article.extra.file__common__attachment['1'].updateDate}">video
+								not supported
+							</video>
+						</div>
+					</td>
+				</tr>
+			</c:if>
+			<c:if test="${article.extra.file__common__attachment['2'] != null  }">
+				<tr>
+					<th>첨부 파일 2</th>
+					<td>
+						<div class="video-box">
+							<video controls
+								src="/usr/file/streamVideo?id=${article.extra.file__common__attachment['2'].id}&updateDate=${article.extra.file__common__attachment['2'].updateDate}">video
+								not supported
+							</video>
+						</div>
+					</td>
+				</tr>
+			</c:if>
+
 		</tbody>
 	</table>
 	<div class="button">
@@ -76,11 +92,28 @@
 		</div>
 	</div>
 </div>
+<div class="btn-box con margin-top-20">
+	<c:if test="${article.extra.actorCanModify }">
+		<a class="btn btn-info" href="modify?id=${article.id}">수정</a>
+	</c:if>
+	<c:if test="${article.extra.actorCanDelete }">
+		<a class="btn btn-info" href="doDelete?id=${article.id}" onclick="if ( confirm('삭제하시겠습니까?') == false) return false;">삭제</a>
+	</c:if>
+</div>
 <c:if test="${isLogined}">
 	<h2 class="con">댓글 작성</h2>
 
-<script>
+	<script>
+	var ArticleWriteReplyForm__submitDone = false;
 	function ArticleWriteReplyForm__submit(form) {
+
+		if ( ArticleWriteReplyForm__submitDone ) {
+			alert('처리중입니다.');
+			return;
+		}
+
+
+		
 		form.body.value = form.body.value.trim();
 		if ( form.body.value.length == 0 ) {
 			alert('댓글을 입력해주세요.');
@@ -88,6 +121,8 @@
 			return;
 		}
 
+
+		ArticleWriteReplyForm__submitDone = true;
 
 		// 실행순서 : 1번 __ 댓글&동영상 파일 업로드 작업에서 제일 먼저 실행되는 JS
 		var startUploadFiles = function(onSuccess) {
@@ -168,12 +203,13 @@
 				form.body.value = '';
 				form.file__reply__0__common__attachment__1.value = '';
 				form.file__reply__0__common__attachment__2.value = '';
+				ArticleWriteReplyForm__submitDone = false;
 			});	
 		});
 
 		
 	}
-</script>
+	</script>
 	<!-- <form method="POST" class="form1" action="./doWriteReply"  Ajax화로 method와 action이 의미없어짐 -->
 	<!-- Ajax화로 form은 이제 발송용으로 사용되지 않는다. -->
 	<form class="form1 table-box con"
@@ -195,7 +231,7 @@
 					<th>첨부1 비디오</th>
 					<td>
 						<div class="form-control-box">
-							<input type="file" accept="video/*" capture
+							<input type="file" accept="video/*"
 								name="file__reply__0__common__attachment__1">
 						</div>
 					</td>
@@ -204,7 +240,7 @@
 					<th>첨부2 비디오</th>
 					<td>
 						<div class="form-control-box">
-							<input type="file" accept="video/*" capture
+							<input type="file" accept="video/*"
 								name="file__reply__0__common__attachment__2">
 						</div>
 					</td>
@@ -246,6 +282,9 @@
 </div>
 
 
+
+
+
 <style>
 .reply-modify-form-modal {
 	position: fixed;
@@ -285,18 +324,6 @@
 
 
 <script>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -380,13 +407,17 @@ function ReplyList__hideModifyFormModal() {
 	
 }
 
+//10초 (자동 로딩????댓글 업로드)
+//ReplyList__loadMoreInterval = 3 * 1000;
+
+
 
 function ReplyList__loadMoreCallback(data) {
 	if (data.body.replies && data.body.replies.length > 0) {
 		ReplyList__lastLodedId = data.body.replies[data.body.replies.length - 1].id;
 		ReplyList__drawReplies(data.body.replies);
 	}
-	setTimeout(ReplyList__loadMore, 2000);
+	setTimeout(ReplyList__loadMore, 1000);
 }
 
 function ReplyList__loadMore() {
@@ -421,16 +452,12 @@ function ReplyList__drawReply(reply) {
 	html += '<td>' + reply.extra.writer + '</td>';
 	html += '<td>';
 	html += '<div class="reply-body">' + reply.body + '</div>';
-	if (reply.extra.file__common__attachment__1) {
-        var file = reply.extra.file__common__attachment__1;
-        html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
-    }
-
-	if (reply.extra.file__common__attachment__2) {
-        var file = reply.extra.file__common__attachment__2;
-        html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '">video not supported</video>';
+	if ( reply.extra.file__common__attachment ) {
+		for ( var no in reply.extra.file__common__attachment ) {
+			var file = reply.extra.file__common__attachment[no];
+			 html += '<div class="video-box"><video controls src="/usr/file/streamVideo?id=' + file.id + '&updateDate=' + file.updateDate + '">video not supported</video></div>';					
+		}
 	}
-    
 	html += '</td>';
 	html += '<td>';
 	if ( reply.extra.actorCanDelete) {

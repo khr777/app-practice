@@ -1,6 +1,7 @@
 package com.sbs.jhs.at.service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import com.sbs.jhs.at.dto.Article;
 import com.sbs.jhs.at.dto.File;
 import com.sbs.jhs.at.dto.Member;
 import com.sbs.jhs.at.dto.Reply;
+import com.sbs.jhs.at.dto.ResultData;
 import com.sbs.jhs.at.util.Util;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,25 +40,24 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 
 	@Override
-	public Article getForPrintArticleById(int id) {
+	public Article getForPrintArticleById(int id, Member actor) {
 
 		Article article = articleDao.getForPrintArticleById(id);
 		
-		File file1 = fileService.getFileByRelId(article.getRelId(), 1);
-
-		if (file1 != null) { // null 이 아니라는 의미는 파일이 존재한다는 것.
-			article.getExtra().put("file__common__attachment__1", file1);
-			// 파일이 존재한다면 댓글의 extra에 "file__~~" 변수명으로 file을 저장하는 것.
+		updateForPrintInfo(actor, article);
+		
+		List<File> files = fileService.getFilesMapKeyFileNo("article", article.getId(), "common", "attachment");
+		
+		Map<String, File> filesMap = new HashMap<>();
+		
+		for ( File file : files ) {
+			filesMap.put(file.getFileNo() + "", file);
 		}
 		
-		File file2 = fileService.getFileByRelId(article.getRelId(), 2);
-
-		if (file2 != null) { // null 이 아니라는 의미는 파일이 존재한다는 것.
-			article.getExtra().put("file__common__attachment__2", file2);
-			// 파일이 존재한다면 댓글의 extra에 "file__~~" 변수명으로 file을 저장하는 것.
-		}
 		
-
+		Util.putExtraVal(article, "file__common__attachment", filesMap);
+		
+		
 		
 
 		return article;
@@ -96,6 +97,30 @@ public class ArticleServiceImpl implements ArticleService {
 	@Override
 	public int modify(@RequestParam Map<String, Object> param, int id) {
 		int a = articleDao.modify(param);
+		
+		id = Util.getAsInt(param.get("id"));
+
+		// 이 값이 존재한다는거 자체가 댓글만 입력된게 아닌 파일첨부된 댓글이 입력된 것임을 알 수 있다.
+		// fileIdsStr로 Ids 복수형을 보아 파일이 1개가 아닌 여러개가 전송될 수도 있겠구나. 여러개 첨부 가능하구나. 라고 유추할 수
+		// 있다.
+		String fileIdsStr = (String) param.get("fileIdsStr");
+
+		// 몰라도 되는 코드이지만 의미하는 바는? 파일이 여러개일 경우 파일 번호를 ,기준으로 쪼개서 한 곳에 모으는 작업을 하는 코드
+		if (fileIdsStr != null && fileIdsStr.length() > 0) {
+			List<Integer> fileIds = Arrays.asList(fileIdsStr.split(",")).stream().map(s -> Integer.parseInt(s.trim()))
+					.collect(Collectors.toList());
+
+			// 1. 파일이 먼저 생성된 후에, 관련 데이터가 생성되는 경우에는, file의 relId가 일단 0으로 저장된다.
+			// 2. 그것을 뒤늦게라도 이렇게 고처야 한다.
+			// 3. 최초 셋팅한 fileId는 0 이고, 파일이 생성되어야 relId를 알 수 있으니 마지막 쯤에 update로 relId를 입력해주는
+			// 것!
+			// 4. 먼저 발송, 저장된 파일의 관련 relId 셋팅해주어야 댓글에서 파일을 불러올 수 있다. 그렇지 않으면 파일 보여지지 않는다.
+			for (int fileId : fileIds) {
+				fileService.changeRelId(fileId, id);
+			}
+
+		}
+		
 		return a;
 	}
 
@@ -152,44 +177,50 @@ public class ArticleServiceImpl implements ArticleService {
 		return reply;
 	}
 
-	@Override
-	public List<Reply> getForPrintReplies(@RequestParam Map<String, Object> param) {
+	
 
-		List<Reply> replies = articleDao.getForPrintRepliesFrom(param);
-
-		Member actor = (Member) param.get("actor");
-
-		System.out.println("articleService's member : " + actor);
-
-		for (Reply reply : replies) {
-
-			// 출력용 부가데이터를 추가한다.
-			updateForPrintInfo(actor, reply);
-		}
-
-		return replies;
-
-	}
-
-	public void updateForPrintInfo(Member actor, Reply reply) {
-		reply.getExtra().put("actorCanDelete", actorCanDelete(actor, reply));
-		reply.getExtra().put("actorCanModify", actorCanModify(actor, reply));
+	public void updateForPrintInfo(Member actor, Article article) {
+		
+		Util.putExtraVal(article, "actorCanDelete", actorCanDelete(actor, article));
+		Util.putExtraVal(article, "actorCanModify", actorCanModify(actor, article));
+		
 
 	}
 
 	// 액터가 해당 댓글을 수정할 수 있는지를 알려준다.
-	public boolean actorCanModify(Member actor, Reply reply) {
-		return actor != null && actor.getId() == reply.getMemberId() ? true : false;
+	public boolean actorCanModify(Member actor, Article article) {
+		return actor != null && actor.getId() == article.getMemberId() ? true : false;
 	}
 
 	// 액터가 해당 댓글을 삭제할 수 있는지를 알려준다.
-	public boolean actorCanDelete(Member actor, Reply reply) {
-		return actorCanModify(actor, reply);
+	public boolean actorCanDelete(Member actor, Article article) {
+		return actorCanModify(actor, article);
 	}
 
 	@Override
 	public void writeRelIdUpdate(int newArticleId) {
 		articleDao.writeRelIdUpdate(newArticleId);
+	}
+
+	@Override
+	public boolean actorCanModify(Member actor, int id) {
+		
+		Article article = articleDao.getArticleById(id);  // 출력용이 아닌 순수하게 article 1개 가져 오기 위함.
+		
+		return actorCanModify(actor, article);
+		
+	}
+
+	@Override
+	public ResultData checkActorCanModify(Member actor, int id) {
+		boolean actorCanModify = actorCanModify(actor, id);
+		
+		if ( actorCanModify) {
+			return new ResultData("S-1", "가능합니다.", "id", id);
+		}
+		
+		return new ResultData("F-1", "권한이 없습니다.", "id", id);
+		
 	}
 
 }

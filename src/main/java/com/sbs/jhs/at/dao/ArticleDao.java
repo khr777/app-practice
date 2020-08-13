@@ -51,6 +51,8 @@ public interface ArticleDao {
 
 	void writeRelIdUpdate(@Param("relId")int relId);
 
+	Article getArticleById(@Param("id") int id);
+
 
 
 }
