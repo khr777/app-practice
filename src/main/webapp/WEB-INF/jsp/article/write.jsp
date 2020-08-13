@@ -7,10 +7,11 @@
 <!-- <textarea></textarea> 는 필히 붙여서 써야 placeholder가 나타난다 -->
 <form method="POST" class="form1 table-box con" action="doWrite"
 	onsubmit="ArticleWriteForm__submit(this); return false;">
-	<input type="hidden" name="redirectUrl" value="/usr/article/detail?id=#id">
-	<input type="hidden" name="loginedMemberId" value="${loginedMemberId}"/>
-	<input type="hidden" name="relTypeCode" value="article" /> 
-	<input type="hidden" name="relId" value="${param.id}" />   
+	<input type="hidden" name="redirectUrl"
+		value="/usr/article/detail?id=#id"> <input type="hidden"
+		name="loginedMemberId" value="${loginedMemberId}" /> <input
+		type="hidden" name="relTypeCode" value="article" /> <input
+		type="hidden" name="relId" value="${param.id}" />
 	<table>
 		<tbody>
 			<tr>
@@ -18,7 +19,7 @@
 				<td>
 					<div class="form-control-box">
 						<input type="text" placeholder="제목을 입력해주세요." name="title"
-							maxlength="100" />
+							maxlength="100" autofocus />
 					</div>
 				</td>
 			</tr>
@@ -31,28 +32,28 @@
 				</td>
 			</tr>
 			<tr>
-					<th>첨부1 비디오</th>
-					<td>
-						<div class="form-control-box">
-							<input type="file" accept="video/*" capture
-								name="file__article__0__common__attachment__1">
-						</div>
-					</td>
-				</tr>
-			<tr>
-			<tr>
-					<th>첨부2 비디오</th>
-					<td>
-						<div class="form-control-box">
-							<input type="file" accept="video/*" capture
-								name="file__article__0__common__attachment__2">
-						</div>
-					</td>
-				</tr>
-				<th>작성</th>
+				<th>첨부1 비디오</th>
 				<td>
-					<button class="btn btn-primary" type="submit">작성</button>
+					<div class="form-control-box">
+						<input type="file" accept="video/*" capture
+							name="file__article__0__common__attachment__1">
+					</div>
 				</td>
+			</tr>
+			<tr>
+			<tr>
+				<th>첨부2 비디오</th>
+				<td>
+					<div class="form-control-box">
+						<input type="file" accept="video/*" capture
+							name="file__article__0__common__attachment__2">
+					</div>
+				</td>
+			</tr>
+			<th>작성</th>
+			<td>
+				<button class="btn btn-primary" type="submit">작성</button>
+			</td>
 			</tr>
 		</tbody>
 	</table>
@@ -83,6 +84,7 @@
 
 		if (form.body.value.length == 0) {
 			alert('내용을 입력해주세요.');
+			form.body.focus();
 			return;
 		}
 

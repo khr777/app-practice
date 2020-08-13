@@ -12,40 +12,42 @@ delStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
 displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
 title CHAR(200) NOT NULL,
 `body` LONGTEXT NOT NULL,
+`relTypeCode` CHAR(50) NOT NULL , 
+`relId` INT(10) UNSIGNED,
  hit INT(10) UNSIGNED DEFAULT 0 NOT NULL,
  memberId INT(10) UNSIGNED NOT NULL
 );
-# article 테이블에 테스트 데이터 삽입
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-title = '비디오디션 구현중',
-`body` = '이것은 내용',
-memberId = 1;
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-title = '동영상을 올릴 수 있을까',
-`body` = '그럼그럼 당연하지',
-displayStatus = 1,
-memberId = 1;
-
-
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-title = '오늘도 화이팅!!!',
-`body` = '댓글을 달아보렴',
-displayStatus = 1,
-memberId = 1;
-
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-title = '으아아아아아아아아',
-`body` = '흐어어어어어어어',
-displayStatus = 1,
-memberId = 1;
+-- # article 테이블에 테스트 데이터 삽입
+-- INSERT INTO article
+-- SET regDate = NOW(),
+-- updateDate = NOW(),
+-- title = '비디오디션 구현중',
+-- `body` = '이것은 내용',
+-- memberId = 1;
+-- INSERT INTO article
+-- SET regDate = NOW(),
+-- updateDate = NOW(),
+-- title = '동영상을 올릴 수 있을까',
+-- `body` = '그럼그럼 당연하지',
+-- displayStatus = 1,
+-- memberId = 1;
+-- 
+-- 
+-- INSERT INTO article
+-- SET regDate = NOW(),
+-- updateDate = NOW(),
+-- title = '오늘도 화이팅!!!',
+-- `body` = '댓글을 달아보렴',
+-- displayStatus = 1,
+-- memberId = 1;
+-- 
+-- INSERT INTO article
+-- SET regDate = NOW(),
+-- updateDate = NOW(),
+-- title = '으아아아아아아아아',
+-- `body` = '흐어어어어어어어',
+-- displayStatus = 1,
+-- memberId = 1;
 
 
 
@@ -65,14 +67,14 @@ memberId INT(10) UNSIGNED NOT NULL,
 displayStatus TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
 `body` LONGTEXT NOT NULL
 );
-
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-displayStatus = 1,
-title = '왜 비콘 처리를 안하니 ',
-`body` = '미치겠단 정말',
-memberId = 1;
+-- 
+-- INSERT INTO article
+-- SET regDate = NOW(),
+-- updateDate = NOW(),
+-- displayStatus = 1,
+-- title = '왜 비콘 처리를 안하니 ',
+-- `body` = '미치겠단 정말',
+-- memberId = 1;
 
 # member 테이블 세팅
 CREATE TABLE `member` (
@@ -166,6 +168,7 @@ relId INT(10) UNSIGNED NOT NULL,
 ); 
 
 
-SELECT * 
+
+SELECT *
 FROM `file`;
 

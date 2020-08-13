@@ -35,14 +35,17 @@
 			</tr>
 			<tr>
 				<th>내용</th>
-				<td>${article.body}
-				<c:if test="${article.extra.file__common__attachment__1 != null }">
-				<video controls src="/usr/file/streamVideo?id=${article.extra.file__common__attachment__1.relId}"></video>
-				</c:if>
-				<c:if test="${article.extra.file__common__attachment__2 != null }">
-				<video controls src="/usr/file/streamVideo?id=${file.id}"></video>
-				</c:if>
-					
+				<td>${article.body}</td>
+			</tr>
+			<tr>
+				<th>첨부 영상</th>
+				<td>
+					<c:if test="${article.extra.file__common__attachment__1 != null }">
+						<video controls src="/usr/file/streamVideo?id=${article.extra.file__common__attachment__1.id}"></video>
+					</c:if> 
+					<c:if test="${article.extra.file__common__attachment__2 != null }">
+						<video controls	src="/usr/file/streamVideo?id=${article.extra.file__common__attachment__2.id}"></video>
+					</c:if>
 				</td>
 			</tr>
 		</tbody>
@@ -76,7 +79,7 @@
 <c:if test="${isLogined}">
 	<h2 class="con">댓글 작성</h2>
 
-	<script>
+<script>
 	function ArticleWriteReplyForm__submit(form) {
 		form.body.value = form.body.value.trim();
 		if ( form.body.value.length == 0 ) {

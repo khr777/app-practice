@@ -78,8 +78,26 @@ public class FileService {
 	public File getFileById(int id) {
 		return fileDao.getFileById(id);
 	}
-	public File getFileByRelId(int relId) {
-		return fileDao.getFileByRelId(relId);
+	public File getFileByRelId(int relId, int fileNo) {
+		return fileDao.getFileByRelId(relId, fileNo);
+	}
+	public void updateFile(String relTypeCode, int relId, String typeCode, String type2Code, int fileNo,
+			String originFileName, String fileExtTypeCode, String fileExtType2Code, String fileExt, byte[] body,
+			int fileSize) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("relTypeCode", relTypeCode);
+		param.put("relId", relId);
+		param.put("typeCode", typeCode);
+		param.put("type2Code", type2Code);
+		param.put("fileNo", fileNo);
+		param.put("originFileName", originFileName);
+		param.put("fileExtTypeCode", fileExtTypeCode);
+		param.put("fileExtType2Code", fileExtType2Code);
+		param.put("fileExt", fileExt);
+		param.put("body", body);
+		param.put("fileSize", fileSize);
+
+		fileDao.update(param);
 	}
 
 }

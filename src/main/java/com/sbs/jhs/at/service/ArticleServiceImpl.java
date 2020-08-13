@@ -41,15 +41,21 @@ public class ArticleServiceImpl implements ArticleService {
 	public Article getForPrintArticleById(int id) {
 
 		Article article = articleDao.getForPrintArticleById(id);
-		System.out.println("article : " + article);
+		
+		File file1 = fileService.getFileByRelId(article.getRelId(), 1);
 
-		File file = fileService.getFileByRelId(article.getRelId());
-		System.out.println("file : " + file);
-
-		if (file != null) { // null 이 아니라는 의미는 파일이 존재한다는 것.
-			article.getExtra().put("file__common__attachment__1", file);
+		if (file1 != null) { // null 이 아니라는 의미는 파일이 존재한다는 것.
+			article.getExtra().put("file__common__attachment__1", file1);
 			// 파일이 존재한다면 댓글의 extra에 "file__~~" 변수명으로 file을 저장하는 것.
 		}
+		
+		File file2 = fileService.getFileByRelId(article.getRelId(), 2);
+
+		if (file2 != null) { // null 이 아니라는 의미는 파일이 존재한다는 것.
+			article.getExtra().put("file__common__attachment__2", file2);
+			// 파일이 존재한다면 댓글의 extra에 "file__~~" 변수명으로 file을 저장하는 것.
+		}
+		
 
 		
 
@@ -96,6 +102,7 @@ public class ArticleServiceImpl implements ArticleService {
 	@Override
 	public int softDelete(int id) {
 		int a = articleDao.softDelete(id);
+		fileService.deleteFiles("article", id);
 		return a;
 	}
 

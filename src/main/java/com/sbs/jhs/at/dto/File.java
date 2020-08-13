@@ -5,11 +5,13 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@ToString(exclude = "body")
 public class File {
 	private int id;
 	private String regDate;
@@ -19,6 +21,7 @@ public class File {
 	private String typeCode;
 	private String type2Code;
 	private String relTypeCode;
+	private String originFileName;
 	private int relId;
 	private String fileExtTypeCode;
 	private String fileExtType2Code;

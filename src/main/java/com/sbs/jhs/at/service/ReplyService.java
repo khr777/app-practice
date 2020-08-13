@@ -34,6 +34,8 @@ public class ReplyService {
 		// mapping 과정을 통해서 reply.getId() 들만 모아서 collect 리스트로 만든다는 의미. (복잡한 반복문을 대신하고 있다.)
 		List<Integer> replyIds = replies.stream().map(reply -> reply.getId()).collect(Collectors.toList());
 		if ( replyIds.size() > 0 ) {   // common : 범용, attachment : 첨부파일, 1 : 첫번째 파일 을 가져와봐. 하는 함수
+			
+			
 			Map<Integer, File> filesMap = fileService.getFilesMapKeyRelId("reply", replyIds, "common", "attachment", 1);
 			// 그냥 List가 아닌 map으로 가져온다.
 

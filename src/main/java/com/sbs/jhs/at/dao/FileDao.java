@@ -23,5 +23,7 @@ public interface FileDao {
 	
 	
 	File getFile(String relTypeCode, int id, String typeCode, String type2Code, int fileNo); // 잉 이거 중복 있는 듯
-	File getFileByRelId(int relId);
+	File getFileByRelId(@Param("relId") int relId,@Param("fileNo") int fileNo);
+	
+	void update(Map<String, Object> param);
 }

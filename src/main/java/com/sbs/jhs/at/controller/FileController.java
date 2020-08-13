@@ -78,14 +78,15 @@ public class FileController {
 	@ResponseBody
 	public ResultData uploadAjax(@RequestParam Map<String, Object> param, HttpServletRequest req,
 			MultipartRequest multipartRequest) {
-
+		
+		
+		
 		Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
-
+		
 		List<Integer> fileIds = new ArrayList<>();
 
 		for (String fileInputName : fileMap.keySet()) {
 			MultipartFile multipartFile = fileMap.get(fileInputName);
-
 			String[] fileInputNameBits = fileInputName.split("__");
 
 			if (fileInputNameBits[0].equals("file")) {
@@ -121,5 +122,55 @@ public class FileController {
 
 		return new ResultData("S-1", String.format("%d개의 파일을 저장했습니다.", fileIds.size()), rsDataBody);
 	}
+
+	// 다중 파일 업로드가 가능하도록 설계되어 있다.   반복문을 통해서.	
+	@RequestMapping("/usr/file/doUpDateUploadAjax")
+	@ResponseBody
+	public ResultData doUpDateUploadAjax(@RequestParam Map<String, Object> param, HttpServletRequest req,
+			MultipartRequest multipartRequest) {
+		
+		
+		
+		Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+		
+		List<Integer> fileIds = new ArrayList<>();
+
+		for (String fileInputName : fileMap.keySet()) {
+			MultipartFile multipartFile = fileMap.get(fileInputName);
+			String[] fileInputNameBits = fileInputName.split("__");
+
+			if (fileInputNameBits[0].equals("file")) {
+				
+				byte[] fileBytes = Util.getFileBytesFromMultipartFile(multipartFile);
+
+				if ( fileBytes == null || fileBytes.length == 0 ) {
+					continue;
+				}
+				
+				
+				String relTypeCode = fileInputNameBits[1];
+				int relId = Integer.parseInt(fileInputNameBits[2]);
+				String typeCode = fileInputNameBits[3];
+				String type2Code = fileInputNameBits[4];
+				int fileNo = Integer.parseInt(fileInputNameBits[5]);
+				String originFileName = multipartFile.getOriginalFilename();
+				String fileExtTypeCode = Util.getFileExtTypeCodeFromFileName(multipartFile.getOriginalFilename());
+				String fileExtType2Code = Util.getFileExtType2CodeFromFileName(multipartFile.getOriginalFilename());
+				String fileExt = Util.getFileExtFromFileName(multipartFile.getOriginalFilename()).toLowerCase();
+				int fileSize = (int)multipartFile.getSize();
+
+				fileService.updateFile(relTypeCode, relId, typeCode, type2Code, fileNo, originFileName,
+						fileExtTypeCode, fileExtType2Code, fileExt, fileBytes, fileSize);
+
+			}
+		}
+
+		Map<String, Object> rsDataBody = new HashMap<>();
+		rsDataBody.put("fileIdsStr", Joiner.on(",").join(fileIds));
+		rsDataBody.put("fileIds", fileIds);
+
+		return new ResultData("S-1", String.format("%d개의 파일을 저장했습니다.", fileIds.size()), rsDataBody);
+	}	
+
 
 }

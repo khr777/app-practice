@@ -3,7 +3,6 @@ package com.sbs.jhs.at.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sbs.jhs.at.dto.Article;
-import com.sbs.jhs.at.dto.File;
 import com.sbs.jhs.at.dto.Member;
 import com.sbs.jhs.at.dto.Reply;
 import com.sbs.jhs.at.dto.ResultData;
@@ -77,20 +75,19 @@ public class ArticleController {
 	// 실무에서 @RequestParam 방법을 많이 사용한다. (int id 방법도 있지만)
 	// 모든 parameter가 'param'에 다 들어가 있다. 꺼내 쓰기만 하면 된다.
 	@RequestMapping("/usr/article/detail")
-	public String showDetail(Model model, @RequestParam Map<String, Object> param) {
+	public String showDetail(Model model, @RequestParam Map<String, Object> param, HttpServletRequest request) {
 
 		int id = Util.getAsInt(param.get("id"));
 		articleService.hitUp(id);
 
 		
-		
-		
-		
-		
 		Article article = articleService.getForPrintArticleById(id);
+	
 		
 		
 		
+		request.setAttribute("article", article);
+		//model.addAttribute("article", article); request나 결과 똑같음
 		
 
 		int beforeId = Util.getAsInt(articleService.getForPageMoveBeforeArticle(id));
@@ -99,7 +96,7 @@ public class ArticleController {
 		model.addAttribute("beforeId", beforeId);
 		model.addAttribute("afterId", afterId);
 
-		model.addAttribute("article", article);
+		
 
 		// List<Reply> replies = articleService.getForPrintReplies(article.getId());
 
@@ -122,6 +119,7 @@ public class ArticleController {
 		
 		
 		int newArticleId = articleService.write(param);
+		
 		articleService.writeRelIdUpdate(newArticleId);
 		rsDataBody.put("newArticleId", newArticleId);
 		
@@ -176,7 +174,8 @@ public class ArticleController {
 
 		Member loginedMember = (Member) request.getAttribute("loginedMember");
 		Article article = articleService.getForPrintArticleById(id);
-
+		System.out.println("힘들다" + article);
+		System.out.println("힘들다" + id);
 		/*
 		 * if ( articleService.actorCanModify(loginedMember, article) == false) { return
 		 * new ResultData("F-1", String.format("%d번 게시물을 수정할 권한이 없습니다.",id )); }
