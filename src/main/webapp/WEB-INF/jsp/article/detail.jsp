@@ -97,7 +97,8 @@
 		<a class="btn btn-info" href="modify?id=${article.id}">수정</a>
 	</c:if>
 	<c:if test="${article.extra.actorCanDelete }">
-		<a class="btn btn-info" href="doDelete?id=${article.id}" onclick="if ( confirm('삭제하시겠습니까?') == false) return false;">삭제</a>
+		<a class="btn btn-info" href="doDelete?id=${article.id}"
+			onclick="if ( confirm('삭제하시겠습니까?') == false) return false;">삭제</a>
 	</c:if>
 </div>
 <c:if test="${isLogined}">
@@ -107,6 +108,9 @@
 	var ArticleWriteReplyForm__submitDone = false;
 	function ArticleWriteReplyForm__submit(form) {
 
+
+		
+			
 		if ( ArticleWriteReplyForm__submitDone ) {
 			alert('처리중입니다.');
 			return;
@@ -302,20 +306,80 @@
 </style>
 
 <div class="reply-modify-form-modal flex flex-jc-c flex-ai-c">
-	<form action="" class="form1  bg-white padding-10"
+	<form action="" class="form1  bg-white padding-10 table-box"
 		onsubmit="ReplyList__submitModifyForm(this); return false;">
-		<input type="hidden" name="id" />
-		<div class="form-row">
-			<div class="form-control-label">내용</div>
-			<div class="form-control-box">
-				<textarea name="body" placeholder="내용을 입력해주세요." autofocus></textarea>
-			</div>
-		</div>
-		<div class="form-row">
-			<div class="form-control-label">수정</div>
-			<div class="form-control-box">
-				<button type="submit">수정</button>
-				<button type="button" onclick="ReplyList__hideModifyFormModal();">취소</button>
+		<table>
+			<tbody>
+				<input type="hidden" name="id" />
+				<div class="form-row">
+					<div class="form-control-label">내용</div>
+					<div class="form-control-box">
+						<textarea name="body" placeholder="내용을 입력해주세요." autofocus></textarea>
+					</div>
+				</div>
+				<tr>
+					<th>첨부 파일 1</th>
+					<td>
+						<div class="form-control-box">
+							<input type="file" accept="video/*"
+								name="file__reply__${reply.id}__common__attachment__1" />
+						</div> <c:if
+							test="${reply.extra.file__common__attachment['1'] != null}">
+							<div class="video-box-reply">
+								<video controls
+									src="/usr/file/streamVideo?id=${reply.extra.file__common__attachment['1'].id}&updateDate=${reply.extra.file__common__attachment['1'].updateDate}">video
+									not supported
+								</video>
+							</div>
+						</c:if>
+					</td>
+				</tr>
+				<tr>
+					<th>첨부 파일 1 삭제</th>
+					<td>
+						<div class="form-control-box">
+							<label><input type="checkbox"
+								name="deleteFile__reply__${reply.id}__common__attachment__1"
+								value="Y" /> 삭제 </label>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>첨부 파일 2</th>
+					<td>
+						<div class="form-control-box">
+							<input type="file" accept="video/*"
+								name="file__reply__${reply.id}__common__attachment__2" />
+						</div> <c:if
+							test="${reply.extra.file__common__attachment['2'] != null}">
+							<div class="video-box-reply">
+								<video controls
+									src="/usr/file/streamVideo?id=${reply.extra.file__common__attachment['2'].id}&updateDate=${reply.extra.file__common__attachment['2'].updateDate}">video
+									not supported
+								</video>
+							</div>
+						</c:if>
+					</td>
+				</tr>
+				<tr>
+					<th>첨부 파일 2 삭제</th>
+					<td>
+						<div class="form-control-box">
+							<label><input type="checkbox"
+								name="deleteFile__reply__${reply.id}__common__attachment__2"
+								value="Y" /> 삭제 </label>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="btn-box margin-top-20">
+			<div class="form-row">
+				<div class="form-control-label">수정</div>
+				<div class="form-control-box">
+					<button type="submit" class="btn btn-primary padding-0-20">수정</button>
+					<button type="button"  class="btn btn-primary padding-0-20" onclick="ReplyList__hideModifyFormModal();">취소</button>
+				</div>
 			</div>
 		</div>
 	</form>
@@ -338,7 +402,7 @@ var ReplyList__lastLodedId = 0;
 var ReplyList__submitModifyFormDone = false;
 
 function ReplyList__submitModifyForm(form) {
-
+	//alert(reply.id);
 		
 	if ( ReplyList__submitModifyFormDone ) {
 		alert('처리중입니다.');
@@ -357,6 +421,7 @@ function ReplyList__submitModifyForm(form) {
 
 	var id = form.id.value;
 	var body = form.body.value;
+	
 	
 	
 
@@ -385,7 +450,7 @@ function ReplyList__showModifyFormModal(el) {
 	
 	var $tr = $(el).closest('tr');
 	var originBody = $tr.data('data-originBody');
-
+	
 	
 	
 	
@@ -393,10 +458,25 @@ function ReplyList__showModifyFormModal(el) {
 
 	var form = $('.reply-modify-form-modal form').get(0);
 
+	//var attachment1 = $tr.data('attachment1');   // 혜련 추가 빼기
+	
+	
+	var reply = $tr.data('attachment1');  // 뭔가 불러오긴 한다!! 
+	
 
 	
 	form.id.value = id;
 	form.body.value = originBody;
+	//alert(file__reply__common__attachment__1.originFileName); // 불러온다 파일 이름을 !!!
+	
+	if ( reply != null ) {
+		alert(reply.originFileName);
+		//form.file__reply__common__attachment__1.value = reply.originFileName;	
+	}
+	
+	
+	//form.file__reply__${reply.id}__common__attachment__1.value = 3;
+	//form.file__reply__id__common__attachment__['1'].value = attachment1.originFileName;  // 혜련 추가 빼기
 	
 	
 }
@@ -476,8 +556,11 @@ function ReplyList__drawReply(reply) {
 	// data는 엘리먼트에 데이터를 추가할 수 있다.
 	// data는 attr보다 더 복잡한 데이터도 저장 가능.
 	$tr.data('data-originBody', reply.body);
+	$tr.data('attachment1', reply.extra.file__common__attachment['1']); // 얘가 파일 이름을 불러와 ㅠㅠㅠㅠㅠㅠ
+	$tr.data('file__reply__${reply.id}__common__attachment__1', reply.extra.file__common__attachment['1']); // 얘가 파일 이름을 불러와 ㅠㅠㅠㅠㅠㅠ
 	
 	ReplyList__$tbody.prepend($tr);
+	
 	
 }	
 

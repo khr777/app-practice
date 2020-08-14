@@ -44,17 +44,25 @@ public class ReplyService {
 
 				if (filesMap2 != null) {
 					reply.getExtra().put("file__common__attachment", filesMap2);
+					
+					
+					System.out.println("reply야, 너가 put한 이름이 뭐니?? : " + reply.getExtra().get("file__common__attachment"));
+					
+					
+					
 				}
+				
 			
 			
 			}
 		
 		}
 		
+		
+		
 
 		Member actor = (Member) param.get("actor");
 
-		System.out.println("articleService's member : " + actor);
 
 		for (Reply reply : replies) {
 
