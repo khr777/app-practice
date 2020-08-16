@@ -41,6 +41,7 @@
 				<tr>
 					<th>첨부 파일 1</th>
 					<td>
+						<!-- 					&updateDate를 붙여서 활용하지 않으면 사용자는 백날 streamVideo?id=~의 동일한 자료를 보게된다. 확인완료.. 신기함-->
 						<div class="video-box">
 							<video controls
 								src="/usr/file/streamVideo?id=${article.extra.file__common__attachment['1'].id}&updateDate=${article.extra.file__common__attachment['1'].updateDate}">video
@@ -303,82 +304,71 @@
 .reply-modify-form-modal-actived .reply-modify-form-modal {
 	display: flex;
 }
+
+.reply-modify-form-modal .form-control-label {
+	width: 120px;
+}
+
+.reply-modify-form-modal .form-control-box {
+	flex: 1 0 0;
+}
+
+.reply-modify-form-modal .video-box {
+	width: 100px;
+}
 </style>
 
 <div class="reply-modify-form-modal flex flex-jc-c flex-ai-c">
 	<form action="" class="form1  bg-white padding-10 table-box"
 		onsubmit="ReplyList__submitModifyForm(this); return false;">
-		<table>
-			<tbody>
-				<input type="hidden" name="id" />
-				<div class="form-row">
-					<div class="form-control-label">내용</div>
-					<div class="form-control-box">
-						<textarea name="body" placeholder="내용을 입력해주세요." autofocus></textarea>
-					</div>
-				</div>
-				<tr>
-					<th>첨부 파일 1</th>
-					<td>
-						<div class="form-control-box">
-							<input type="file" accept="video/*"
-								name="file__reply__${reply.id}__common__attachment__1" />
-						</div> <c:if
-							test="${reply.extra.file__common__attachment['1'] != null}">
-							<div class="video-box-reply">
-								<video controls
-									src="/usr/file/streamVideo?id=${reply.extra.file__common__attachment['1'].id}&updateDate=${reply.extra.file__common__attachment['1'].updateDate}">video
-									not supported
-								</video>
-							</div>
-						</c:if>
-					</td>
-				</tr>
-				<tr>
-					<th>첨부 파일 1 삭제</th>
-					<td>
-						<div class="form-control-box">
-							<label><input type="checkbox"
-								name="deleteFile__reply__${reply.id}__common__attachment__1"
-								value="Y" /> 삭제 </label>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<th>첨부 파일 2</th>
-					<td>
-						<div class="form-control-box">
-							<input type="file" accept="video/*"
-								name="file__reply__${reply.id}__common__attachment__2" />
-						</div> <c:if
-							test="${reply.extra.file__common__attachment['2'] != null}">
-							<div class="video-box-reply">
-								<video controls
-									src="/usr/file/streamVideo?id=${reply.extra.file__common__attachment['2'].id}&updateDate=${reply.extra.file__common__attachment['2'].updateDate}">video
-									not supported
-								</video>
-							</div>
-						</c:if>
-					</td>
-				</tr>
-				<tr>
-					<th>첨부 파일 2 삭제</th>
-					<td>
-						<div class="form-control-box">
-							<label><input type="checkbox"
-								name="deleteFile__reply__${reply.id}__common__attachment__2"
-								value="Y" /> 삭제 </label>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<input type="hidden" name="id" />
+		<div class="form-row">
+			<div class="form-control-label">내용</div>
+			<div class="form-control-box">
+				<textarea name="body" placeholder="내용을 입력해주세요." autofocus></textarea>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-control-label">첨부파일 1</div>
+			<div class="form-control-box">
+				<input type="file" accept="video/*"
+					data-name="file__reply__0__common__attachment__1" />
+				<div class="video-box video-box-file-1"></div>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-control-label">첨부파일 1 삭제</div>
+			<div class="form-control-box">
+				<label> <input type="checkbox"
+					data-name="deleteFile__reply__0__common__attachment__1" value="Y" />
+					삭제
+				</label>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-control-label">첨부파일 2</div>
+			<div class="form-control-box">
+				<input type="file" accept="video/*"
+					data-name="file__reply__0__common__attachment__2" />
+				<div class="video-box video-box-file-2"></div>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-control-label">첨부파일 2 삭제</div>
+			<div class="form-control-box">
+				<label> <input type="checkbox"
+					data-name="deleteFile__reply__0__common__attachment__2" value="Y" />
+					삭제
+				</label>
+			</div>
+		</div>
 		<div class="btn-box margin-top-20">
 			<div class="form-row">
 				<div class="form-control-label">수정</div>
 				<div class="form-control-box">
 					<button type="submit" class="btn btn-primary padding-0-20">수정</button>
-					<button type="button"  class="btn btn-primary padding-0-20" onclick="ReplyList__hideModifyFormModal();">취소</button>
+					<button type="button" class="btn btn-primary padding-0-20"
+						onclick="ReplyList__hideModifyFormModal();">취소</button>
 				</div>
 			</div>
 		</div>
@@ -422,26 +412,103 @@ function ReplyList__submitModifyForm(form) {
 	var id = form.id.value;
 	var body = form.body.value;
 	
+
 	
-	
+
+	var fileInput1 = form['file__reply__' + id + '__common__attachment__1'];
+	var fileInput2 = form['file__reply__' + id + '__common__attachment__2'];
+
+	var deleteFileInput1 = form["deleteFile__reply__" + id + "__common__attachment__1"];
+	var deleteFileInput2 = form["deleteFile__reply__" + id + "__common__attachment__2"];
+
+	// 삭제 체크가 되어있다면 업로드할 파일에 있는 것은 값을 비워준다..?
+	if (deleteFileInput1.checked) {
+		fileInput1.value = '';
+	}
+	if (deleteFileInput2.checked) {
+		fileInput2.value = '';
+	}
 
 	ReplyList__submitModifyFormDone = true;
 
-	$.post('../reply/doModifyReplyAjax', {
-		id: id,
-		body: body
+
+
+	// 파일 업로드 시작  // 얘가 실행된다... 
+	var startUploadFiles = function() {
+		if (fileInput1.value.length == 0 && fileInput2.value.length == 0) {
+			if (deleteFileInput1.checked == false
+					&& deleteFileInput2.checked == false) {
+				onUploadFilesComplete(); // 파일업로드 할 가치가 없다고 판단되면 파일 업로드 끝났다. 라고 처리
+				return;
+			}
+		}
+			
+		var fileUploadFormData = new FormData(form); // 파일 업로드할 가치가 있다면 ajax를 통해 실행 후, 파일 업로드 끝났다고 끝낸 함수 실행
+
+		/*    안지워도 된다. 의미 없다.
+		fileUploadFormData.delete("relTypeCode");
+		fileUploadFormData.delete("relId");
+		fileUploadFormData.delete("body");
+		*/	
+ 		$.ajax({
+			url : './../file/doUploadAjax',
+			data : fileUploadFormData,
+			processData : false,
+			contentType : false,
+			dataType:"json",
+			type : 'POST',
+			success : onUploadFilesComplete  
+		});
+	}
+
+	// 파일 업로드 완료시 실행되는 함수 // 한마디로 startUploadFiles 실행 후 onUploadFilesComplete가 실행되는 것!
+	var onUploadFilesComplete = function(data) {
+		var fileIdsStr = '';
+		if ( data && data.body && data.body.fileIdsStr ) {
+			fileIdsStr = data.body.fileIdsStr;
+		}
+
+		startModifyReply(fileIdsStr);	// if문 작업 후 fileIdsStr을 startModifyReply에 넘겨주는 역할을 한다.
+	};
 	
-	}, function(data){
+	// 댓글 수정 시작  // 파일 업로드가 끝나면 실행되는.   파일 업로드 후 수정 시작하는
+	var startModifyReply = function(fileIdsStr) {
+		$.post('../reply/doModifyReplyAjax', {
+			id: id,
+			body: body,
+			fileIdsStr: fileIdsStr
+		}, onModifyReplyComplete, 'json');  // 그리고 댓글 수정이 끝나면 onModifyReplyComplete가 실행되는 것이다.
+	};
+	
+ 	// 댓글 수정이 완료되면 실행되는 함수
+ 	var onModifyReplyComplete =  function(data){
 		if (data.resultCode && data.resultCode.substr(0, 2) == 'S-') {
-			// 성공시에는 기존에 그려진 내용을 수정해야 한다.!!
 			var $tr = $('.reply-list-box tbody > tr[data-id="' + id
 					+ '"] .reply-body');
 			$tr.empty().append(body);
+
+			// 댓글이 수정되면 무조건 video-box를 먼저 비운다.
+			var $tr = $('.reply-list-box tbody > tr[data-id="' + id + '"] .video-box').empty();
+
+			if ( data && data.body && data.body.file__common__attachment) {
+				for ( var fileNo in data.body.file__common__attachment) {
+					var file = data.body.file__common__attachment[fileNo];
+
+					var html = '<video controls src="/usr/file/streamVideo?id=' + file.id + '&updateDate=' + file.updateDate + '">video not supported</video>';
+					$('.reply-list-box tbody > tr[data-id="' + id + '"] [data-file-no="' + fileNo + '"].video-box').append(html); 
+				}
+			}
 		}
+
+		if ( data.msg ) {
+			alert(data.msg);
+		}
+		
 		ReplyList__hideModifyFormModal();
 		ReplyList__submitModifyFormDone = false;
-		}, 'json');
-
+	};
+	
+	startUploadFiles(); // 맨 처음에 얘가 실행된다... 그 다음에는 얘로 찾아가보자.
 	
 }
 
@@ -461,18 +528,54 @@ function ReplyList__showModifyFormModal(el) {
 	//var attachment1 = $tr.data('attachment1');   // 혜련 추가 빼기
 	
 	
-	var reply = $tr.data('attachment1');  // 뭔가 불러오긴 한다!! 
+	//var reply = $tr.data('attachment1');  // 뭔가 불러오긴 한다!! 
 	
+	$(form).find('[data-name]').each(function(index, el){
+		var $el = $(el);
+		var name = $el.attr('data-name');
+		name = name.replace('__0__', '__' + id + '__');
+		name = $el.attr('name', name);
 
+
+		if ( $el.prop('type') == 'file') {
+			$el.val('');
+		}
+		else if ( $el.prop('type') == 'checkbox') {
+			$el.prop('checked', false);
+		}
+
+
+
+		
+	});
+
+
+
+	for ( fileNo = 1; fileNo <= 2; fileNo++) {
+		$('.reply-modify-form-modal .video-box-file-' + fileNo).empty();
+		var videoName = 'reply__' + id + '__common__attachment__' + fileNo;
+
+		// .reply-list-box 안에서 data-video-name= ??,   ??이라는 이름을 가진 값을 찾아서 $videoBox 안에 넣는다.
+		var $videoBox = $('.reply-list-box [data-video-name="' + videoName + '"]');
+
+		if ( $videoBox.length > 0 ) {
+			$('.reply-modify-form-modal .video-box-file-' + fileNo).append($videoBox.html());
+		}
+				
+	}
+
+	
+	
+		
 	
 	form.id.value = id;
 	form.body.value = originBody;
 	//alert(file__reply__common__attachment__1.originFileName); // 불러온다 파일 이름을 !!!
 	
-	if ( reply != null ) {
+/* 	if ( reply != null ) {
 		alert(reply.originFileName);
 		//form.file__reply__common__attachment__1.value = reply.originFileName;	
-	}
+	} */
 	
 	
 	//form.file__reply__${reply.id}__common__attachment__1.value = 3;
@@ -488,7 +591,7 @@ function ReplyList__hideModifyFormModal() {
 }
 
 //10초 (자동 로딩????댓글 업로드)
-//ReplyList__loadMoreInterval = 3 * 1000;
+ReplyList__loadMoreInterval = 3 * 1000;
 
 
 
@@ -497,7 +600,7 @@ function ReplyList__loadMoreCallback(data) {
 		ReplyList__lastLodedId = data.body.replies[data.body.replies.length - 1].id;
 		ReplyList__drawReplies(data.body.replies);
 	}
-	setTimeout(ReplyList__loadMore, 1000);
+	setTimeout(ReplyList__loadMore, ReplyList__loadMoreInterval);
 }
 
 function ReplyList__loadMore() {
@@ -532,12 +635,22 @@ function ReplyList__drawReply(reply) {
 	html += '<td>' + reply.extra.writer + '</td>';
 	html += '<td>';
 	html += '<div class="reply-body">' + reply.body + '</div>';
-	if ( reply.extra.file__common__attachment ) {
-		for ( var no in reply.extra.file__common__attachment ) {
-			var file = reply.extra.file__common__attachment[no];
-			 html += '<div class="video-box"><video controls src="/usr/file/streamVideo?id=' + file.id + '&updateDate=' + file.updateDate + '">video not supported</video></div>';					
+
+	// 있던 없던 일단 그리고 본다.
+	for ( var fileNo = 1; fileNo <= 2; fileNo++ ) {
+		html += '<div class="video-box" data-video-name="reply__' + reply.id + '__common__attachment__' + fileNo + '" data-file-no="' + fileNo + '">';
+		if ( reply.extra.file__common__attachment && reply.extra.file__common__attachment[fileNo] ) {
+			var file = reply.extra.file__common__attachment[fileNo];
+			html += '<video controls src="/usr/file/streamVideo?id=' + file.id + '&updateDate=' + file.updateDate + '">video not supported</video>';
 		}
-	}
+		else {
+			
+		}
+		html += '</div>';
+	} 
+	
+
+	
 	html += '</td>';
 	html += '<td>';
 	if ( reply.extra.actorCanDelete) {
@@ -556,8 +669,8 @@ function ReplyList__drawReply(reply) {
 	// data는 엘리먼트에 데이터를 추가할 수 있다.
 	// data는 attr보다 더 복잡한 데이터도 저장 가능.
 	$tr.data('data-originBody', reply.body);
-	$tr.data('attachment1', reply.extra.file__common__attachment['1']); // 얘가 파일 이름을 불러와 ㅠㅠㅠㅠㅠㅠ
-	$tr.data('file__reply__${reply.id}__common__attachment__1', reply.extra.file__common__attachment['1']); // 얘가 파일 이름을 불러와 ㅠㅠㅠㅠㅠㅠ
+	//$tr.data('attachment1', reply.extra.file__common__attachment['1']); // 얘가 파일 이름을 불러와 ㅠㅠㅠㅠㅠㅠ
+	//$tr.data('file__reply__${reply.id}__common__attachment__1', reply.extra.file__common__attachment['1']); // 얘가 파일 이름을 불러와 ㅠㅠㅠㅠㅠㅠ
 	
 	ReplyList__$tbody.prepend($tr);
 	

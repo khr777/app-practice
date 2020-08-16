@@ -37,10 +37,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		// 메인, 로그인, 로그인 처리, 가입, 가입 처리, 게시물 리스트, 게시물 상세 빼고는 모두 로그인 상태여야 접근이 가능하다.
 		// ★ 로그인 없이도 접속할 수 있는 URI 전부 기술
 		// WebMvcConfig class가 실행되는 순서 (2).
-		registry.addInterceptor(needToLoginInterceptor).addPathPatterns("/**").excludePathPatterns("/resource/**")
+		registry.addInterceptor(needToLoginInterceptor).addPathPatterns("/**").excludePathPatterns("/").excludePathPatterns("/resource/**")
 		.excludePathPatterns("/usr/home/main").excludePathPatterns("/usr/member/login").excludePathPatterns("/usr/member/doLogin")
-				.excludePathPatterns("/usr/member/join").excludePathPatterns("/usr/member/doJoin")
-				.excludePathPatterns("/usr/article/list").excludePathPatterns("/usr/article/detail");
+				.excludePathPatterns("/usr/member/join").excludePathPatterns("/usr/member/doJoin").excludePathPatterns("/usr/file/streamVideo")
+				.excludePathPatterns("/usr/article/list").excludePathPatterns("/usr/article/detail").excludePathPatterns("/usr/reply/getForPrintRepliesRs");
 
 		// 로그인, 로그인처리, 가입, 가입 처리는 로그인 상태일 때 접근할 수 없다.
 		// 로그인 상태에서 접속할 수 없는 URI 전부 기술

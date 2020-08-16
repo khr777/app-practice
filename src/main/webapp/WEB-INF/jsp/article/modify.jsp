@@ -7,6 +7,13 @@
 <script>
 	var ArticleModifyForm__submitDone = false;
 	function ArticleModifyForm__submit(form) {
+
+		if (ArticleModifyForm__submitDone) {
+			alert('처리중입니다.');
+			return;
+		}
+
+		
 		var fileInput1 = form["file__article__" + param.id
 				+ "__common__attachment__1"];
 		var fileInput2 = form["file__article__" + param.id
@@ -23,10 +30,7 @@
 			fileInput2.value = '';
 		}
 
-		if (ArticleModifyForm__submitDone) {
-			alert('처리중입니다.');
-			return;
-		}
+	
 		form.title.value = form.title.value.trim();
 		if (form.title.value.length == 0) {
 			form.title.focus();

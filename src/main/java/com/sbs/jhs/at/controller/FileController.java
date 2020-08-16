@@ -111,15 +111,22 @@ public class FileController {
 				
 				
 				int oldFileId = fileService.getFileId(relTypeCode, relId, typeCode, type2Code, fileNo);
-			
+				
+				// article 1 common attachment 1 
+				// article 관련된 article 번호 1번의 일반적인 일반 첨부파일 중 첫번째 파일을 의미.
+				// 파일이 있다면! 일치하는 변수명이 있다면 updateFile, 없다면 saveFile 실행하게 한다.
+				
+				
 				
 				boolean needToUpdate = oldFileId > 0;
 				
 				
 				if ( needToUpdate ) {
+					fileService.updateFile(oldFileId, originFileName, fileExtTypeCode, fileExtType2Code, fileExt, fileBytes, fileSize);
 					
 					fileCache.refresh(oldFileId);
-					fileService.updateFile(oldFileId, originFileName, fileExtTypeCode, fileExtType2Code, fileExt, fileBytes, fileSize);
+					// 기존 파일을 가지고 있을테니 updateFile을 보여주기 위해서 refresh해주는 것! 무엇을? 캐시를
+					//refresh를 해주지 않으면 나는 다른 동영상으로 updateFile(업로드)하여도 사용자는 기존의 오래된 영상을 보게 된다.
 					
 				}
 				else {

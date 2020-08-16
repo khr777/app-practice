@@ -110,6 +110,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- 유틸용, Maps.of 같은거 쓸 수 있게 해줌 -->

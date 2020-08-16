@@ -100,7 +100,7 @@ public class FileService {
 
 		fileDao.update(param);
 	}
-	public List<File> getFilesMapKeyFileNo(String relTypeCode, int relId, String typeCode, String type2Code) {
+	public List<File> getFiles(String relTypeCode, int relId, String typeCode, String type2Code) {
 		
 		List<File> files = fileDao.getFilesRelTypeCodeAndRelIdAndTypeCodeAndType2Code(relTypeCode, relId, typeCode, type2Code);
 		
@@ -153,6 +153,19 @@ public class FileService {
 	}
 	public void deleteFile(int id) {
 		fileDao.deleteFile(id);
+	}
+	public Map<Integer, File> getFilesMapKeyFileNo(String relTypeCode, int relId, String typeCode, String type2Code) {
+		List<File> files = getFiles(relTypeCode, relId, typeCode, type2Code);
+		
+		Map<Integer, File> filesMap = new HashMap<>();
+		
+		
+		for ( File file : files ) {      // key name을 FileNo로 하는 이유는 훨씬 편하기 때문.
+			filesMap.put(file.getFileNo(), file);
+		}
+		
+		
+		return filesMap;
 	}
 	
 	

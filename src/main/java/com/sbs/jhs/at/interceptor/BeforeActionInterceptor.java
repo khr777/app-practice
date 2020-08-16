@@ -72,6 +72,14 @@ public class BeforeActionInterceptor implements HandlerInterceptor {
 				isAjax = true;
 			}
 		}
+
+		if ( isAjax == false ) {
+			if ( requestUri.contains("/get")) {
+				isAjax = true;
+			}
+		}
+		
+		
 		
 		request.setAttribute("isAjax", isAjax);
 		

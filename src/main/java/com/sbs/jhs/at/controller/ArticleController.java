@@ -178,6 +178,8 @@ public class ArticleController {
 	@RequestMapping("/usr/article/doModify")
 	public String doModify(@RequestParam Map<String, Object> param, int id, HttpServletRequest request, Model model) {
 		
+		// 고객이 요청한 내용 중 해커에 의해 더러운 정보가 담길 수 있으므로 그 param에서 내가 필요로하는 
+		//순수한 정보만을 얻어 newParam으로 만들어서 사용하기 위함(Util.getNewmapOf의 내용)
 		Map<String, Object> newParam = Util.getNewMapOf(param, "title", "body", "fileIdsStr", "articleId","id");
 		Member loginedMember = (Member)request.getAttribute("loginedMember");
 		

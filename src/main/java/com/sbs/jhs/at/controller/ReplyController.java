@@ -103,6 +103,9 @@ public class ReplyController {
 		
 		ResultData rd = replyService.modifyReply(modifyReplyParam);
 		
+		reply = replyService.getForPrintReplyById(id);
+		
+		
 		return rd;
 
 	}
